@@ -1,0 +1,97 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: lumen
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, pdo_mysql, xml
+        ini-values: post_max_size=256M, upload_max_filesize=256M, max_execution_time=300
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Copy .env.example to .env
+      run: cp .env.example .env
+
+    #- name: Generate application key
+    #  run: php artisan key:generate
+
+    #- name: Run migrations
+    #  env:
+    #    DB_CONNECTION: mysql
+    #    DB_HOST: 127.0.0.1
+    #    DB_PORT: 3306
+    #    DB_DATABASE: lumen
+    #    DB_USERNAME: user
+    #    DB_PASSWORD: password
+    #  run: php artisan migrate
+
+    - name: Run tests
+      run: vendor/bin/phpunit
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Test SSH connection
+      run: ssh -o StrictHostKeyChecking=no ubuntu@37.152.182.169 echo "SSH connection successful"
+
+    - name: Deploy to server
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@37.152.182.169 << 'EOF'
+          # Change permission
+          sudo chown -R ubuntu:ubuntu /var/www/html/
+          sudo chmod -R 755 /var/www/html/
+          # Change directory
+          cd /home/ubuntu
+          # Download files
+          git clone https://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@github.com/maryamgholampoor/englishLearning.git
+          # Replace files
+          rsync -av --delete --exclude '.env' --exclude 'storage' --exclude 'public' englishLearning/ /var/www/html/
+          # Remove files
+          rm -rf englishLearning
+          # Run essential commands
+          cd /var/www/html/
+          sudo composer install --no-interaction --prefer-dist --optimize-autoloader || composer update
+          php artisan migrate --force
+          cd /home/ubuntu
+          # Reset permission to the default
+          sudo chown -R www-data:www-data /var/www/html/
+          sudo chmod -R 755 /var/www/html/public/uploads/
+        EOF
