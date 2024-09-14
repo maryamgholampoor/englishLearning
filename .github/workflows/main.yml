@@ -76,8 +76,8 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@37.152.182.169 << 'EOF'
           # Change permission
-          sudo chown -R ubuntu:ubuntu /var/www/html/
-          sudo chmod -R 755 /var/www/html/
+          # sudo chown -R ubuntu:ubuntu /var/www/html/
+          # sudo chmod -R 755 /var/www/html/
           # Change directory
           cd /home/ubuntu
           # Download files
