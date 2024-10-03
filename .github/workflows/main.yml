@@ -76,22 +76,22 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@37.152.182.169 << 'EOF'
           # Change permission
-          # sudo chown -R ubuntu:ubuntu /var/www/html/
-          # sudo chmod -R 755 /var/www/html/
+          sudo chown -R ubuntu:ubuntu /var/www/api/
+          sudo chmod -R 755 /var/www/api/
           # Change directory
           cd /home/ubuntu
           # Download files
           git clone https://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@github.com/maryamgholampoor/englishLearning.git
           # Replace files
-          rsync -av --delete --exclude '.env' --exclude 'storage' --exclude 'public' englishLearning/ /var/www/html/
+          rsync -av --delete --exclude '.env' --exclude 'storage' --exclude 'public' englishLearning/ /var/www/api/
           # Remove files
           rm -rf englishLearning
           # Run essential commands
-          cd /var/www/html/
+          cd /var/www/api/
           sudo composer install --no-interaction --prefer-dist --optimize-autoloader || composer update
           php artisan migrate --force
           cd /home/ubuntu
           # Reset permission to the default
-          sudo chown -R www-data:www-data /var/www/html/
-          sudo chmod -R 755 /var/www/html/public/uploads/
+          sudo chown -R www-data:www-data /var/www/api/
+          sudo chmod -R 755 /var/www/api/public/uploads/
         EOF
