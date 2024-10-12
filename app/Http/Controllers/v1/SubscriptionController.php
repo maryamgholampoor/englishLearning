@@ -33,6 +33,7 @@ class SubscriptionController extends Controller
 
     public function addSubscription(Request $request)
     {
+        return "ssss";
         DB::beginTransaction();
         try {
             $name = $request->name;
