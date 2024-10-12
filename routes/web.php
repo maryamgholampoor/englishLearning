@@ -23,13 +23,18 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('login', ['as' => 'login', 'uses' => "LoginController@doLogin"]);
             $router->post('login/code', ['as' => 'login.code', 'uses' => "LoginController@checkLoginCode"]);
             $router->post('login/code', ['as' => 'login.code', 'uses' => "LoginController@checkLoginCode"]);
-
         });
 
         $router->group(['prefix' => 'padcast'], function () use ($router) {
-            $router->post('padcast-category', ['as' => 'padcast.add', 'uses' => "PadcastController@addPadcastCategory"]);
-            $router->get('padcast-category/{id}', ['as' => 'padcast.show', 'uses' => "PadcastController@showPadcastCategory"]);
-            $router->put('padcast-category/{id}', ['as' => 'padcast.update', 'uses' => "PadcastController@updatePadcastCategory"]);
+            $router->post('padcastCategory', ['as' => 'padcast.add', 'uses' => "PadcastController@addPadcastCategory"]);
+            $router->get('padcastCategory', ['as' => 'padcast.show', 'uses' => "PadcastController@showPadcastCategory"]);
+            $router->post('updatePadcastCategory/{id}', ['as' => 'padcast.update', 'uses' => "PadcastController@updatePadcastCategory"]);
+            $router->delete('deletePadcastCategory/{id}', ['as' => 'padcast.delete', 'uses' => "PadcastController@deletePadcastCategory"]);
+
+            $router->post('addPadcast', ['as' => 'padcast.add', 'uses' => "PadcastController@addPadcast"]);
+            $router->get('showPadcast', ['as' => 'padcast.show', 'uses' => "PadcastController@showPadcast"]);
+            $router->post('updatePadcast/{id}', ['as' => 'padcast.update', 'uses' => "PadcastController@updatePadcast"]);
+            $router->delete('deletePadcast/{id}', ['as' => 'padcast.delete', 'uses' => "PadcastController@deletePadcast"]);
         });
 
         $router->group(['prefix' => 'users'], function () use ($router) {
@@ -38,7 +43,6 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('deleteUser', ['as' => 'users.delete', 'uses' => "UsersController@deleteUser"]);
             $router->post('editUsers', ['as' => 'users.edit', 'uses' => "UsersController@editUsers"]);
         });
-
 
         $router->group(['prefix' => 'subscription'], function () use ($router) {
             $router->post('addSubscription', ['as' => 'subscription.add', 'uses' => "SubscriptionController@addSubscription"]);

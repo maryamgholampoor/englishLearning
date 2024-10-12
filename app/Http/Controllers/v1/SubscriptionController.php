@@ -129,13 +129,11 @@ class SubscriptionController extends Controller
         try {
             $subscription_id = $request->subscription_id;
 
-            // Find the subscription by ID
             $Subscription = Subscription::find($subscription_id);
             if (!$Subscription) {
                 return $this->sendJsonResponse([], trans('message.subscription_not_found'), $this->getStatusCodeByCodeName('Not Found'));
             }
 
-            // Delete the subscription
             $Subscription->delete();
 
             DB::commit();

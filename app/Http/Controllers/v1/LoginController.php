@@ -5,6 +5,8 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Utilities\Request as UtilityRequest;
 use App\Http\Utilities\Response;
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use App\Http\Utilities\StatusCode;
 use App\Models\LoginCode;
@@ -30,32 +32,45 @@ class LoginController extends Controller
     public function doLogin(Request $request)
     {
 
-        if (!$this->validateRequest($request->all())) {
-            return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
-        }
+        $url = "https://portal.amootsms.com/rest/SendWithPattern";
 
+        $url = $url."?"."Token=".urlencode("8AADD086A29A2C589E380BE2D9BE20822D403B38");
+        $url = $url."&"."Mobile=09038231952";
+        $url = $url."&"."PatternCodeID=2844";
+        $url = $url."&"."PatternValues=user_name,code";
 
-        // Insert data
-        DB::beginTransaction();
-        try {
-            // Check mobile number exist
-            $user = User::where('mobile_number',$request->mobile_number)->first();
-            if (!$user) {
-                $user = User::create(['mobile_number' => $request->mobile_number, 'user_status' => User::USER_ACTIVE]);
-            }
-            // Create login code and send it
-            $code = $this->randomDigits(5);
-            $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
-            LoginCode::create(['code' => $code, 'user_id' => $user->id, 'expiration_time' => $expiration]);
-            $this->sendLoginCode($request->mobile_number, $code);
-            // Commit transaction
-            DB::commit();
-            // Return response
-            return $this->sendJsonResponse(['user' => $user], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
-        }
+        $json = file_get_contents($url);
+        return $json;
+
+//      $result = json_decode($json);
+//      echo $result->Status;
+
+//        if (!$this->validateRequest($request->all()))
+//        {
+//            return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
+//        }
+//
+//        // Insert data
+//        DB::beginTransaction();
+//        try {
+//            // Check mobile number exist
+//            $user = User::where('mobile_number',$request->mobile_number)->first();
+//            if (!$user) {
+//                $user = User::create(['mobile_number' => $request->mobile_number, 'user_status' => User::USER_ACTIVE]);
+//            }
+//            // Create login code and send it
+//            $code = $this->randomDigits(5);
+//            $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
+//            LoginCode::create(['code' => $code, 'user_id' => $user->id, 'expiration_time' => $expiration]);
+//           return $this->sendLoginCode($request->mobile_number, $code);
+//            // Commit transaction
+//            DB::commit();
+//            // Return response
+//            return $this->sendJsonResponse(['user' => $user], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+//        } catch (\Exception $exception) {
+//            DB::rollBack();
+//            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+//        }
     }
 
     public function checkLoginCode(Request $request)
@@ -75,7 +90,7 @@ class LoginController extends Controller
             $result->used_time = date('Y-m-d H:i:s');
             $result->save();
             // Redirect to register form or panel form
-//            $userRegistered = !($result->user->user_type == User::USER_TYPE_TEMPORARY);
+            //$userRegistered = !($result->user->user_type == User::USER_TYPE_TEMPORARY);
             // Generate Token if needed
             $token = JWTAuth::fromUser($result->user);
             // Return response
