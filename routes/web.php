@@ -72,5 +72,27 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->delete('BookSeason/{id', ['as' => 'bookSeason.delete' ,'uses' => 'BookController@deleteBookSeason']);
 
         });
+
+        $router->group(['prefix' => 'ticket'], function () use ($router)
+        {
+            $router->post('addTicket', ['as' => 'ticket.add' ,'uses' => 'TicketController@addTicket']);
+            $router->post('editTicket/{id}', ['as' => 'ticket.edit' ,'uses' => 'TicketController@editTicket']);
+            $router->get('showAllTickets', ['as' => 'ticket.show' ,'uses' => 'TicketController@showAllTickets']);
+            $router->get('showUserTicket', ['as' => 'ticket.showUser' ,'uses' => 'TicketController@showUserTicket']);
+        });
+
+        $router->group(['prefix' => 'application'], function () use ($router)
+        {
+            $router->post('uploadApplication', ['as' => 'ticket.add' ,'uses' => 'TicketController@uploadApplication']);
+        });
+
+        $router->group(['prefix' => 'bookmark'], function () use ($router)
+        {
+            $router->post('add', ['as' => 'bookmark.add' ,'uses' => 'BookController@addBookmark']);
+            $router->post('delete', ['as' => 'bookmark.delete' ,'uses' => 'BookController@deleteBookmark']);
+            $router->get('show/{user_id}', ['as' => 'bookmark.show' ,'uses' => 'BookController@showBookmark']);
+
+        });
+
     });
 });

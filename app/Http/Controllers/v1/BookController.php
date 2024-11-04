@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Utilities\Request as UtilityRequest;
 use App\Http\Utilities\Response;
 use App\Models\Book;
+use App\Models\Bookmark;
 use App\Models\BookSeason;
 use Illuminate\Http\Request;
 use App\Http\Utilities\StatusCode;
@@ -13,6 +14,7 @@ use App\Models\BookCategory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use function PHPUnit\Framework\isEmpty;
 
 class BookController extends Controller
 {
@@ -128,8 +130,7 @@ class BookController extends Controller
 
             return $this->sendJsonResponse($book, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        } catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
@@ -137,7 +138,8 @@ class BookController extends Controller
 
     }
 
-    public function editBook(Request $request,$id){
+    public function editBook(Request $request, $id)
+    {
 
         $book_category_id = $request->book_category_id;
         $name = $request->name;
@@ -149,8 +151,7 @@ class BookController extends Controller
 
             $book->book_category_id = $book_category_id;
             $book->name = $name;
-            if ($request->hasFile('image'))
-            {
+            if ($request->hasFile('image')) {
                 $fileName = $image->getClientOriginalName();
                 $path = app()->basePath('public/uploads/book' . DIRECTORY_SEPARATOR);
 
@@ -208,13 +209,11 @@ class BookController extends Controller
     public function showBookWithCategory(Request $request)
     {
         try {
-            $bookCategory_id=$request->bookCategory_id;
-            $book=Book::where('book_category_id',$bookCategory_id)->get();
+            $bookCategory_id = $request->bookCategory_id;
+            $book = Book::where('book_category_id', $bookCategory_id)->get();
             return $this->sendJsonResponse($book, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        }
-        catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
@@ -257,15 +256,15 @@ class BookController extends Controller
 
             return $this->sendJsonResponse($bookSeason, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        } catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
 
     }
 
-    public function editBookSeason(Request $request,$id){
+    public function editBookSeason(Request $request, $id)
+    {
 
         $book_id = $request->book_id;
         $title_fa = $request->title_fa;
@@ -301,8 +300,7 @@ class BookController extends Controller
 
             return $this->sendJsonResponse($bookSeason, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        } catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
@@ -327,8 +325,8 @@ class BookController extends Controller
     {
         try {
             DB::beginTransaction();
-            $id=$request->book_id;
-            $BookSeason = BookSeason::where('book_id',$id)->get();
+            $id = $request->book_id;
+            $BookSeason = BookSeason::where('book_id', $id)->get();
             DB::commit();
 
             return $this->sendJsonResponse($BookSeason, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
@@ -350,6 +348,87 @@ class BookController extends Controller
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
+    }
+
+    public function addBookmark(Request $request)
+    {
+        $book_id = $request->book_id;
+        $user_id = $request->user_id;
+
+        $this->validate($request, [
+            'user_id' => 'required|integer',
+            'book_id' => 'required|integer',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $bookmark = Bookmark::where('user_id', $user_id)->where('book_id', $book_id)->first();
+
+            if(empty($bookmark))
+            {
+                $bookmark = new Bookmark();
+                $bookmark->user_id = $user_id;
+                $bookmark->book_id = $book_id;
+                $bookmark->save();
+
+                DB::commit();
+                return $this->sendJsonResponse($bookmark, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+
+            }
+            else
+            {
+                DB::commit();
+                return $this->sendJsonResponse([], 'this bookmark is exist', $this->getStatusCodeByCodeName('OK'));
+            }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+    }
+
+    public function deleteBookmark(Request $request)
+    {
+        $book_id = $request->book_id;
+        $user_id = $request->user_id;
+
+        $this->validate($request, [
+            'user_id' => 'required|integer',
+            'book_id' => 'required|integer',
+        ]);
+
+        try {
+
+            DB::beginTransaction();
+
+            $bookmark = Bookmark::where('book_id', $book_id)->where('user_id', $user_id)->delete();
+
+            DB::commit();
+            if ($bookmark) {
+                return $this->sendJsonResponse($bookmark, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+            }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+
+    }
+
+    public function showBookmark(Request $request,$user_id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $bookmark = Bookmark::with('user')->where('user_id', $user_id)->get();
+
+            DB::commit();
+            return $this->sendJsonResponse($bookmark, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+
     }
 
 
