@@ -19,7 +19,7 @@ class Bookmark extends Model
      * @var string[]
      */
 
-    protected $table='Bookmark';
+    protected $table='bookmark';
 
     public function user()
     {
