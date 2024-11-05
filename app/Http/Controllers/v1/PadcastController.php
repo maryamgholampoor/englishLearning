@@ -274,8 +274,6 @@ class PadcastController extends Controller
         try {
             DB::beginTransaction();
             $padcast = Padcast::find($id);
-            
-            DB::commit();
 
             if ($padcast) {
 
@@ -284,6 +282,11 @@ class PadcastController extends Controller
             } else {
                 return $this->sendJsonResponse([], trans('Not Found'), $this->getStatusCodeByCodeName('OK'));
             }
+
+            DB::commit();
+
+            return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+
         }
         catch (\Exception $exception) {
             DB::rollBack();

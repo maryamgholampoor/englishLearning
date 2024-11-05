@@ -19,7 +19,7 @@ class Subscription extends Model
      * @var string[]
      */
 
-    protected $table= 'Subscription';
+    protected $table= 'subscription';
 
 
     public function SubscriptionFeauter()
