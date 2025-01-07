@@ -15,7 +15,6 @@ use App\Http\Controllers\v1\LoginController;
 |
 */
 
-
 $router->group(['prefix' => 'v1'], function () use ($router) {
     $router->group(['namespace' => $path_info[1] ?? 'v1'], function () use ($router) {
 
@@ -94,5 +93,23 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
 
         });
 
+        $router->group(['prefix' => 'wordCategory'], function () use ($router)
+        {
+            $router->post('add', ['as' => 'wordCategory.add' ,'uses' => 'WordController@insertWordCategory']);
+            $router->put('update/{id}', ['as' => 'wordCategory.update' ,'uses' => 'WordController@updateWordCategory']);
+            $router->delete('delete/{id}', ['as' => 'wordCategory.delete' ,'uses' => 'WordController@deleteWordCategory']);
+            $router->post('show', ['as' => 'wordCategory.show' ,'uses' => 'WordController@showWordCategory']);
+        });
+
+        $router->group(['prefix' => 'wordUser'], function () use ($router)
+        {
+            $router->post('add', ['as' => 'wordUser.add' ,'uses' => 'WordController@storeUserWord']);
+        });
+
+        $router->group(['prefix' => 'word'], function () use ($router)
+        {
+            $router->post('showCategoryWord', ['as' => 'word.CategoryWord' ,'uses' => 'WordController@showCategoryWord']);
+            $router->post('showVoice', ['as' => 'word.CategoryWord' ,'uses' => 'WordController@showVoice']);
+        });
     });
 });

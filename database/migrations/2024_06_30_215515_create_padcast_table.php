@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('file_path');
             $table->time('time');
             $table->string('bulk');
+            $table->unsignedBigInteger('padcastCategory_id');
             $table->timestamps();
             $table->softDeletes();
         });

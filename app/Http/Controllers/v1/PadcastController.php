@@ -163,34 +163,41 @@ class PadcastController extends Controller
         // Validate the request input
         $this->validate($request, [
             'name' => 'required|string|max:255',
-            'time' => 'required|date_format:H:i:s',
-            'bulk' => 'required|string|max:255',
-            'image' => 'required',
+            'file' => 'required'
         ]);
 
         try {
             // Start a transaction
             DB::beginTransaction();
 
-            $image = $request->file('image');
-            $fileName = $image->getClientOriginalName();
-            $path = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
+            $file = $request->file('file');
+            $fileName = $file->getClientOriginalName();
+            $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
 
-            if ($request->hasFile('image')) {
-                if (!File::exists($path)) {
-                    File::makeDirectory($path, 0777, true);
+            if($request->hasFile('file')){
+                if (!File::exists($pathFile)) {
+                    File::makeDirectory($pathFile, 0777, true);
                 }
-                $image->move($path, $fileName);
+                $file->move($pathFile, $fileName);
                 $path_file = "uploads/padcast/$fileName";
             }
+
+            $sizeFile=File::size($path_file);
+
+            $getID3 = new \getID3;
+            $video_file = $getID3->analyze($path_file);
+            $duration_seconds = $video_file['playtime_seconds'];
+            $duration = date('H:i:s', $duration_seconds);
 
             // Create a new Padcast
             $padcast = new Padcast();
             $padcast->name = $request->input('name');
+            $padcast->time = $duration;
+            $padcast->bulk = $this->formatBytes($sizeFile);
             $padcast->file_path = $path_file;
-            $padcast->time = $request->input('time');
-            $padcast->bulk = $request->input('bulk');
+            $padcast->padcastCategory_id = $request->input('padcastCategory_id');;
             $padcast->save();
+
 
             // Commit the transaction
             DB::commit();
@@ -292,6 +299,14 @@ class PadcastController extends Controller
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
+    }
+
+    public function formatBytes($size, $precision = 2)
+    {
+        $base = log($size, 1024);
+        $suffixes = array('', 'K', 'M', 'G', 'T');
+
+        return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)];
     }
 
 }

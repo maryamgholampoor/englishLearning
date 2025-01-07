@@ -149,7 +149,7 @@ class SubscriptionController extends Controller
         DB::beginTransaction();
         try {
 
-            $Subscription=Subscription::with('SubscriptionFeauter')->get();
+            $Subscription=Subscription::with('SubscriptionFeature')->get();
 
             DB::commit();
             return $this->sendJsonResponse($Subscription, trans('message.user_updated_successfully'), $this->getStatusCodeByCodeName('OK'));

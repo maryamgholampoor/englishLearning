@@ -58,7 +58,7 @@ class BookController extends Controller
         ]);
         try {
             DB::beginTransaction();
-            $bookCategory = BookCategory::findOrFail($id);
+            $bookCategory = BookCategory::find($id);
             $bookCategory->name = $request->name;
             $bookCategory->save();
             DB::commit();
@@ -181,7 +181,7 @@ class BookController extends Controller
     {
         try {
             DB::beginTransaction();
-            $book = Book::get();
+            $book = Book::with('bookCategory')->get();
             DB::commit();
 
             return $this->sendJsonResponse($book, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));

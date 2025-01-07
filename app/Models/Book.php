@@ -21,4 +21,9 @@ class Book extends Model
 
     protected $table='book';
 
+    public function bookCategory()
+    {
+        return $this->belongsTo(BookCategory::class,'book_category_id');
+    }
+
 }
