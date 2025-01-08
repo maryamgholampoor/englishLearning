@@ -57,9 +57,9 @@ class BookController extends Controller
             'name' => 'required|string|max:255',
         ]);
         try {
-            DB::beginTransaction();
             $bookCategory = BookCategory::find($id);
             $bookCategory->name = $request->name;
+            DB::beginTransaction();
             $bookCategory->save();
             DB::commit();
 
@@ -140,7 +140,6 @@ class BookController extends Controller
 
     public function editBook(Request $request, $id)
     {
-
         $book_category_id = $request->book_category_id;
         $name = $request->name;
         $image = $request->image;
