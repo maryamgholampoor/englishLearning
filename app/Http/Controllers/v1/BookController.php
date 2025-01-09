@@ -56,11 +56,14 @@ class BookController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
         ]);
+
         try {
+            DB::beginTransaction();
+
             $bookCategory = BookCategory::find($id);
             $bookCategory->name = $request->name;
-            DB::beginTransaction();
             $bookCategory->save();
+
             DB::commit();
 
             return $this->sendJsonResponse($bookCategory, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
@@ -71,10 +74,10 @@ class BookController extends Controller
         }
     }
 
-    public function showBookCategory($id)
+    public function showBookCategory()
     {
         try {
-            $bookCategory = BookCategory::findOrFail($id);
+            $bookCategory = BookCategory::all();
 
             return $this->sendJsonResponse($bookCategory, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 

@@ -55,7 +55,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
         {
             $router->post('bookCategories', ['as' => 'book.add' ,'uses' => 'BookController@addBookCategory']);
             $router->put('bookCategories/{id}', ['as' => 'book.edit' ,'uses' => 'BookController@editBookCategory']);
-            $router->get('bookCategories/{id}', ['as' => 'bookCategories.show' ,'uses' => 'BookController@showBookCategory']);
+            $router->get('bookCategories', ['as' => 'bookCategories.show' ,'uses' => 'BookController@showBookCategory']);
             $router->delete('bookCategories/{id}', ['as' => 'bookCategories.delete' ,'uses' => 'BookController@deleteBookCategory']);
 
             $router->post('book', ['as' => 'book.add' ,'uses' => 'BookController@addBook']);

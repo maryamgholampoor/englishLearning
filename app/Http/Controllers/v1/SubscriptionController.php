@@ -39,6 +39,7 @@ class SubscriptionController extends Controller
             $price = $request->price;
             $duration = $request->duration;
             $feature = $request->feature;
+            $pic_type = $request->pic_type;
 
             $this->rules = [
                 'name'=>'required|string',
@@ -60,10 +61,11 @@ class SubscriptionController extends Controller
 
             if($Subscription)
             {
-                foreach ($feature as $fetur)
+                foreach ($feature as $key=>$fetur)
                 {
                     $SubscriptionFeature=new SubscriptionFeature();
                     $SubscriptionFeature->feature=$fetur;
+                    $SubscriptionFeature->pic_type=$pic_type[$key];
                     $SubscriptionFeature->subscription_id=$Subscription->id;
                     $SubscriptionFeature->save();
                 }
@@ -85,6 +87,7 @@ class SubscriptionController extends Controller
             $price = $request->price;
             $duration = $request->duration;
             $feature = $request->feature;
+            $pic_type = $request->pic_type;
 
             $this->rules = [
                 'name' => 'required|string',
@@ -108,9 +111,10 @@ class SubscriptionController extends Controller
             SubscriptionFeature::where('subscription_id', $Subscription->id)->delete();
 
             // اضافه کردن ویژگی‌های جدید
-            foreach ($feature as $fetur) {
+            foreach ($feature as $key=>$fetur) {
                 $SubscriptionFeature = new SubscriptionFeature();
                 $SubscriptionFeature->feature = $fetur;
+                $SubscriptionFeature->pic_type=$pic_type[$key];
                 $SubscriptionFeature->subscription_id = $Subscription->id;
                 $SubscriptionFeature->save();
             }
