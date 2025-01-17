@@ -82,7 +82,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
 
         $router->group(['prefix' => 'application'], function () use ($router)
         {
-            $router->post('uploadApplication', ['as' => 'ticket.add' ,'uses' => 'TicketController@uploadApplication']);
+            $router->post('uploadApplication', ['as' => 'ticket.add' ,'uses' => 'UploadApplication@uploadApplication']);
         });
 
         $router->group(['prefix' => 'bookmark'], function () use ($router)
