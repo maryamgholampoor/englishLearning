@@ -37,7 +37,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
         });
 
         $router->group(['prefix' => 'users'], function () use ($router) {
-            $router->put('showUsers', ['as' => 'users.show', 'uses' => "UsersController@showAllUsers"]);
+            $router->get('showUsers', ['as' => 'users.show', 'uses' => "UsersController@showAllUsers"]);
             $router->post('showProfile', ['as' => 'users.showProfile', 'uses' => "UsersController@showProfile"]);
             $router->post('deleteUser', ['as' => 'users.delete', 'uses' => "UsersController@deleteUser"]);
             $router->post('editUsers', ['as' => 'users.edit', 'uses' => "UsersController@editUsers"]);
