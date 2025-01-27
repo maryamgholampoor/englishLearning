@@ -108,6 +108,8 @@ class BookController extends Controller
 
         $book_category_id = $request->book_category_id;
         $name = $request->name;
+        $accent = $request->accent;
+        $author = $request->author;
         $image = $request->image;
 
         try {
@@ -128,6 +130,8 @@ class BookController extends Controller
             DB::beginTransaction();
             $book = new Book();
             $book->book_category_id = $book_category_id;
+            $book->author = $author;
+            $book->accent = $accent;
             $book->name = $name;
             $book->image_path = $path_file;
             $book->save();
@@ -147,6 +151,8 @@ class BookController extends Controller
     {
         $book_category_id = $request->book_category_id;
         $name = $request->name;
+        $accent = $request->accent;
+        $author = $request->author;
         $image = $request->image;
 
         try {
@@ -154,6 +160,8 @@ class BookController extends Controller
             $book = Book::findOrFail($id);
 
             $book->book_category_id = $book_category_id;
+            $book->accent = $accent;
+            $book->author = $author;
             $book->name = $name;
             if ($request->hasFile('image')) {
                 $fileName = $image->getClientOriginalName();
@@ -472,7 +480,6 @@ class BookController extends Controller
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
     }
-
 
 }
 
