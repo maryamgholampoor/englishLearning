@@ -22,7 +22,7 @@ class Subscription extends Model
     protected $table= 'subscription';
 
 
-    public function SubscriptionFeauter()
+    public function SubscriptionFeature()
     {
         return $this->hasMany(SubscriptionFeature::class,'subscription_id');
     }

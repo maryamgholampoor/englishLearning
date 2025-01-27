@@ -8,6 +8,8 @@ use App\Http\Utilities\Response;
 use App\Models\Book;
 use App\Models\Bookmark;
 use App\Models\BookSeason;
+use App\Models\Padcast;
+use App\Models\SubscriptionFeature;
 use Illuminate\Http\Request;
 use App\Http\Utilities\StatusCode;
 use App\Models\BookCategory;
@@ -230,6 +232,7 @@ class BookController extends Controller
         $title_en = $request->title_en;
         $image = $request->image;
         $text = $request->text;
+        $season_name = $request->season_name;
 
         try {
             $fileName = $image->getClientOriginalName();
@@ -253,6 +256,7 @@ class BookController extends Controller
             $bookSeason->image = $path_file;
             $bookSeason->text = $text;
             $bookSeason->book_id = $book_id;
+            $bookSeason->season_name = $season_name;
             $bookSeason->save();
             DB::commit();
 
@@ -367,8 +371,7 @@ class BookController extends Controller
 
             $bookmark = Bookmark::where('user_id', $user_id)->where('book_id', $book_id)->first();
 
-            if(empty($bookmark))
-            {
+            if (empty($bookmark)) {
                 $bookmark = new Bookmark();
                 $bookmark->user_id = $user_id;
                 $bookmark->book_id = $book_id;
@@ -377,9 +380,7 @@ class BookController extends Controller
                 DB::commit();
                 return $this->sendJsonResponse($bookmark, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-            }
-            else
-            {
+            } else {
                 DB::commit();
                 return $this->sendJsonResponse([], 'this bookmark is exist', $this->getStatusCodeByCodeName('OK'));
             }
@@ -416,7 +417,7 @@ class BookController extends Controller
 
     }
 
-    public function showBookmark(Request $request,$user_id)
+    public function showBookmark(Request $request, $user_id)
     {
         try {
             DB::beginTransaction();
@@ -431,6 +432,45 @@ class BookController extends Controller
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
 
+    }
+
+    public function multiDelete(Request $request)
+    {
+        $type = $request->type;
+        $book_id = $request->book_id;
+        $pudcast_id = $request->book_id;
+
+        try {
+            DB::beginTransaction();
+
+            if ($type == "pudcast") {
+
+                foreach ($pudcast_id as $key=>$id)
+                {
+                    $pudcast=Padcast::where('id',$id)->delete();
+                }
+
+                DB::commit();
+                return $this->sendJsonResponse($pudcast, trans('message.delete_successfully'), $this->getStatusCodeByCodeName('OK'));
+            }
+
+            else if ($type == "book") {
+
+                foreach ($book_id as $key=>$id)
+                {
+                    $book=Book::where('id',$id)->delete();
+                }
+
+                DB::commit();
+                return $this->sendJsonResponse($book, trans('message.delete_successfully'), $this->getStatusCodeByCodeName('OK'));
+            }
+
+        }
+        catch (\Exception $exception)
+        {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
     }
 
 
