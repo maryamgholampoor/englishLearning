@@ -174,7 +174,8 @@ class PadcastController extends Controller
             $fileName = $file->getClientOriginalName();
             $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
 
-            if($request->hasFile('file')){
+            if($request->hasFile('file'))
+            {
                 if (!File::exists($pathFile)) {
                     File::makeDirectory($pathFile, 0777, true);
                 }
@@ -196,7 +197,7 @@ class PadcastController extends Controller
             $padcast->time = $duration;
             $padcast->bulk = $this->formatBytes($sizeFile);
             $padcast->file_path = $path_file;
-            $padcast->padcastCategory_id = $request->input('padcastCategory_id');;
+            $padcast->padcastCategory_id = $request->input('padcastCategory_id');
             $padcast->save();
 
 
@@ -230,40 +231,55 @@ class PadcastController extends Controller
         // Validate the request input
         $this->validate($request,[
             'name' => 'required|string|max:255',
-            'time' => 'required|date_format:H:i:s',
-            'bulk' => 'required|string|max:255',
+            'text' => 'string',
+            'padcastCategory_id'=> 'required'
         ]);
 
         try {
             DB::beginTransaction();
+
+            $file = $request->file('file');
+            $fileName = $file->getClientOriginalName();
+            $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
+
+            if($request->hasFile('file'))
+            {
+                if (!File::exists($pathFile)) {
+                    File::makeDirectory($pathFile, 0777, true);
+                }
+                $file->move($pathFile, $fileName);
+                $path_file = "uploads/padcast/$fileName";
+            }
+
+            $sizeFile=File::size($path_file);
+
+            $getID3 = new \getID3;
+            $video_file = $getID3->analyze($path_file);
+            $duration_seconds = $video_file['playtime_seconds'];
+            $duration = date('H:i:s', $duration_seconds);
+
             $padcast = Padcast::find($id);
 
-            if ($request->hasFile('image'))
-            {
-
-                $image = $request->file('image');
-                $fileName = $image->getClientOriginalName();
-                $path = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
-
-                if ($request->hasFile('image')) {
-                    if (!File::exists($path)) {
-                        File::makeDirectory($path, 0777, true);
-                    }
-                    $image->move($path, $fileName);
-                    $path_file = "uploads/padcast/$fileName";
-                    $padcast->file_path = $path_file;
-                }
+            if (!File::exists($pathFile)) {
+                File::makeDirectory($pathFile, 0777, true);
             }
+
+            $file->move($pathFile, $fileName);
+            $path_file = "uploads/padcast/$fileName";
 
             if ($request->has('name')) {
                 $padcast->name = $request->input('name');
             }
-            if ($request->has('time')) {
-                $padcast->time = $request->input('time');
+            if ($request->has('text')) {
+                $padcast->text = $request->input('text');
             }
-            if ($request->has('bulk')) {
-                $padcast->bulk = $request->input('bulk');
+            if ($request->has('padcastCategory_id')) {
+                $padcast->text = $request->input('text');
             }
+
+            $padcast->time = $duration;
+            $padcast->file_path = $path_file;
+            $padcast->bulk = $this->formatBytes($sizeFile);
 
             $padcast->save();
 
