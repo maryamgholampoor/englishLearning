@@ -192,6 +192,7 @@ class PadcastController extends Controller
             // Create a new Padcast
             $padcast = new Padcast();
             $padcast->name = $request->input('name');
+            $padcast->text = $request->input('text');
             $padcast->time = $duration;
             $padcast->bulk = $this->formatBytes($sizeFile);
             $padcast->file_path = $path_file;
