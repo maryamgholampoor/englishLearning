@@ -51,70 +51,67 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('showFeatureSubscription', ['as' => 'subscriptionFeature.show', 'uses' => "SubscriptionController@showFeatureSubscription"]);
         });
 
-        $router->group(['prefix' => 'book'], function () use ($router)
-        {
-            $router->post('bookCategories', ['as' => 'book.add' ,'uses' => 'BookController@addBookCategory']);
-            $router->put('bookCategories/{id}', ['as' => 'book.edit' ,'uses' => 'BookController@editBookCategory']);
-            $router->get('bookCategories', ['as' => 'bookCategories.show' ,'uses' => 'BookController@showBookCategory']);
-            $router->delete('bookCategories/{id}', ['as' => 'bookCategories.delete' ,'uses' => 'BookController@deleteBookCategory']);
+        $router->group(['prefix' => 'book'], function () use ($router) {
+            $router->post('bookCategories', ['as' => 'book.add', 'uses' => 'BookController@addBookCategory']);
+            $router->put('bookCategories/{id}', ['as' => 'book.edit', 'uses' => 'BookController@editBookCategory']);
+            $router->get('bookCategories', ['as' => 'bookCategories.show', 'uses' => 'BookController@showBookCategory']);
+            $router->delete('bookCategories/{id}', ['as' => 'bookCategories.delete', 'uses' => 'BookController@deleteBookCategory']);
 
-            $router->post('book', ['as' => 'book.add' ,'uses' => 'BookController@addBook']);
-            $router->put('book/{id}', ['as' => 'book.edit' ,'uses' => 'BookController@editBook']);
-            $router->get('book', ['as' => 'book.show' ,'uses' => 'BookController@showBook']);
-            $router->delete('book/{id}', ['as' => 'book.delete' ,'uses' => 'BookController@deleteBook']);
-            $router->post('showBookWithCategory', ['as' => 'book.delete' ,'uses' => 'BookController@showBookWithCategory']);
+            $router->post('book', ['as' => 'book.add', 'uses' => 'BookController@addBook']);
+            $router->put('book/{id}', ['as' => 'book.edit', 'uses' => 'BookController@editBook']);
+            $router->get('book', ['as' => 'book.show', 'uses' => 'BookController@showBook']);
+            $router->delete('book/{id}', ['as' => 'book.delete', 'uses' => 'BookController@deleteBook']);
+            $router->post('showBookWithCategory', ['as' => 'book.delete', 'uses' => 'BookController@showBookWithCategory']);
 
-            $router->post('bookSeason', ['as' => 'bookSeason.add' ,'uses' => 'BookController@addBookSeason']);
-            $router->post('bookSeason/{id}', ['as' => 'bookSeason.edit' ,'uses' => 'BookController@editBookSeason']);
-            $router->get('bookAllSeason', ['as' => 'bookSeason.showAll' ,'uses' => 'BookController@showAllBookSeason']);
-            $router->get('bookSeason', ['as' => 'bookSeason.show' ,'uses' => 'BookController@showBookSeason']);
-            $router->delete('BookSeason/{id', ['as' => 'bookSeason.delete' ,'uses' => 'BookController@deleteBookSeason']);
-
-        });
-
-        $router->group(['prefix' => 'ticket'], function () use ($router)
-        {
-            $router->post('addTicket', ['as' => 'ticket.add' ,'uses' => 'TicketController@addTicket']);
-            $router->post('editTicket/{id}', ['as' => 'ticket.edit' ,'uses' => 'TicketController@editTicket']);
-            $router->get('showAllTickets', ['as' => 'ticket.show' ,'uses' => 'TicketController@showAllTickets']);
-            $router->get('showUserTicket', ['as' => 'ticket.showUser' ,'uses' => 'TicketController@showUserTicket']);
-        });
-
-        $router->group(['prefix' => 'application'], function () use ($router)
-        {
-            $router->post('uploadApplication', ['as' => 'ticket.add' ,'uses' => 'UploadApplication@uploadApplication']);
-        });
-
-        $router->group(['prefix' => 'bookmark'], function () use ($router)
-        {
-            $router->post('add', ['as' => 'bookmark.add' ,'uses' => 'BookController@addBookmark']);
-            $router->post('delete', ['as' => 'bookmark.delete' ,'uses' => 'BookController@deleteBookmark']);
-            $router->get('show/{user_id}', ['as' => 'bookmark.show' ,'uses' => 'BookController@showBookmark']);
+            $router->post('bookSeason', ['as' => 'bookSeason.add', 'uses' => 'BookController@addBookSeason']);
+            $router->post('bookSeason/{id}', ['as' => 'bookSeason.edit', 'uses' => 'BookController@editBookSeason']);
+            $router->get('bookAllSeason', ['as' => 'bookSeason.showAll', 'uses' => 'BookController@showAllBookSeason']);
+            $router->get('bookSeason', ['as' => 'bookSeason.show', 'uses' => 'BookController@showBookSeason']);
+            $router->delete('BookSeason/{id', ['as' => 'bookSeason.delete', 'uses' => 'BookController@deleteBookSeason']);
 
         });
 
-        $router->group(['prefix' => 'wordCategory'], function () use ($router)
-        {
-            $router->post('add', ['as' => 'wordCategory.add' ,'uses' => 'WordController@insertWordCategory']);
-            $router->put('update/{id}', ['as' => 'wordCategory.update' ,'uses' => 'WordController@updateWordCategory']);
-            $router->delete('delete/{id}', ['as' => 'wordCategory.delete' ,'uses' => 'WordController@deleteWordCategory']);
-            $router->post('show', ['as' => 'wordCategory.show' ,'uses' => 'WordController@showWordCategory']);
+        $router->group(['prefix' => 'ticket'], function () use ($router) {
+
+            $router->post('addTicket', ['as' => 'ticket.add', 'uses' => 'TicketController@addTicket']);
+            $router->post('editTicket/{id}', ['as' => 'ticket.edit', 'uses' => 'TicketController@editTicket']);
+            $router->get('showAllTickets', ['as' => 'ticket.show', 'uses' => 'TicketController@showAllTickets']);
+            $router->get('showUserTicket', ['as' => 'ticket.showUser', 'uses' => 'TicketController@showUserTicket']);
         });
 
-        $router->group(['prefix' => 'wordUser'], function () use ($router)
-        {
-            $router->post('add', ['as' => 'wordUser.add' ,'uses' => 'WordController@storeUserWord']);
+        $router->group(['prefix' => 'admin'], function () use ($router) {
+            $router->post('login', ['as' => 'admin.login', 'uses' => 'LoginController@login']);
         });
 
-        $router->group(['prefix' => 'word'], function () use ($router)
-        {
-            $router->post('showCategoryWord', ['as' => 'word.CategoryWord' ,'uses' => 'WordController@showCategoryWord']);
-            $router->post('showVoice', ['as' => 'word.CategoryWord' ,'uses' => 'WordController@showVoice']);
+        $router->group(['prefix' => 'application'], function () use ($router) {
+            $router->post('uploadApplication', ['as' => 'ticket.add', 'uses' => 'UploadApplication@uploadApplication']);
         });
 
-        $router->group(['prefix' => 'delete'], function () use ($router)
-        {
-            $router->post('listDelete', ['as' => 'List.delete' ,'uses' => 'PadcastController@multiDelete']);
+        $router->group(['prefix' => 'bookmark'], function () use ($router) {
+            $router->post('add', ['as' => 'bookmark.add', 'uses' => 'BookController@addBookmark']);
+            $router->post('delete', ['as' => 'bookmark.delete', 'uses' => 'BookController@deleteBookmark']);
+            $router->get('show/{user_id}', ['as' => 'bookmark.show', 'uses' => 'BookController@showBookmark']);
+
+        });
+
+        $router->group(['prefix' => 'wordCategory'], function () use ($router) {
+            $router->post('add', ['as' => 'wordCategory.add', 'uses' => 'WordController@insertWordCategory']);
+            $router->put('update/{id}', ['as' => 'wordCategory.update', 'uses' => 'WordController@updateWordCategory']);
+            $router->delete('delete/{id}', ['as' => 'wordCategory.delete', 'uses' => 'WordController@deleteWordCategory']);
+            $router->post('show', ['as' => 'wordCategory.show', 'uses' => 'WordController@showWordCategory']);
+        });
+
+        $router->group(['prefix' => 'wordUser'], function () use ($router) {
+            $router->post('add', ['as' => 'wordUser.add', 'uses' => 'WordController@storeUserWord']);
+        });
+
+        $router->group(['prefix' => 'word'], function () use ($router) {
+            $router->post('showCategoryWord', ['as' => 'word.CategoryWord', 'uses' => 'WordController@showCategoryWord']);
+            $router->post('showVoice', ['as' => 'word.CategoryWord', 'uses' => 'WordController@showVoice']);
+        });
+
+        $router->group(['prefix' => 'delete'], function () use ($router) {
+            $router->post('listDelete', ['as' => 'List.delete', 'uses' => 'PadcastController@multiDelete']);
         });
 
     });

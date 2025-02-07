@@ -26,6 +26,7 @@ $app = new Laravel\Lumen\Application(
  $app->withFacades();
  $app->withEloquent();
 
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -36,6 +37,9 @@ $app = new Laravel\Lumen\Application(
 | your own bindings here if you like or you can make another file.
 |
 */
+
+//$app->register(Laravel\Passport\PassportServiceProvider);
+$app->configure('auth');
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,

@@ -2,23 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Support\Facades\Hash;
 
-class Word extends Model
+class Admin extends Model
 {
-   use SoftDeletes;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var string[]
-     */
+    protected $table = 'admins'; // Ensure this matches your database table name
 
-    protected $table='word';
+    protected $fillable = ['email', 'password'];
+
+    protected $hidden = ['password'];
+
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::make($value);
+    }
 
 }

@@ -5,14 +5,10 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Utilities\Request as UtilityRequest;
 use App\Http\Utilities\Response;
-use App\Models\Book;
-use App\Models\BookSeason;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use App\Http\Utilities\StatusCode;
-use App\Models\BookCategory;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class TicketController extends Controller

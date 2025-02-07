@@ -5,14 +5,19 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use App\Http\Utilities\Request as UtilityRequest;
 use App\Http\Utilities\Response;
+use App\Models\Admin;
 use DateTime;
 use DateTimeZone;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use App\Http\Utilities\StatusCode;
 use App\Models\LoginCode;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 class LoginController extends Controller
 {
@@ -108,6 +113,66 @@ class LoginController extends Controller
             $result .= random_int(0, 9);
         }
         return $result;
+    }
+
+    private $jwt_secret = "your_secret_key"; // Change this to a strong secret key
+
+    public function login(Request $request)
+    {
+        // Validate request
+        $this->validate($request, [
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        // Find admin by email
+        $admin = Admin::where('email', $request->email)->first();
+
+        if (!$admin || !Hash::check($request->password, $admin->password)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        // Generate JWT Token
+        $payload = [
+            'iss' => "lumen-jwt", // Issuer of the token
+            'sub' => $admin->id, // Subject of the token (admin ID)
+            'iat' => time(), // Issued at
+            'exp' => time() + 60 * 60 // Token expiration time (1 hour)
+        ];
+
+        $token = JWT::encode($payload, $this->jwt_secret, 'HS256');
+
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $token,
+            'admin' => $admin
+        ]);
+    }
+
+    public function profile(Request $request)
+    {
+        $admin = $this->getAuthenticatedAdmin($request);
+        if (!$admin) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json($admin);
+    }
+
+    private function getAuthenticatedAdmin($request)
+    {
+        $token = $request->header('Authorization');
+
+        if (!$token) {
+            return null;
+        }
+
+        try {
+            $decoded = JWT::decode(str_replace('Bearer ', '', $token), new Key($this->jwt_secret, 'HS256'));
+            return Admin::find($decoded->sub);
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
 }
