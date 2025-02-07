@@ -111,5 +111,11 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('showCategoryWord', ['as' => 'word.CategoryWord' ,'uses' => 'WordController@showCategoryWord']);
             $router->post('showVoice', ['as' => 'word.CategoryWord' ,'uses' => 'WordController@showVoice']);
         });
+
+        $router->group(['prefix' => 'delete'], function () use ($router)
+        {
+            $router->post('listDelete', ['as' => 'List.delete' ,'uses' => 'PadcastController@multiDelete']);
+        });
+
     });
 });

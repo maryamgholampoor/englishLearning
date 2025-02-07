@@ -5,6 +5,13 @@ namespace App\Http\Controllers\v1;
 use App\Http\Utilities\Request as UtilityRequest;
 use App\Http\Utilities\Response;
 use App\Http\Utilities\StatusCode;
+use App\Models\Book;
+use App\Models\BookCategory;
+use App\Models\BookSeason;
+use App\Models\Music;
+use App\Models\Subscription;
+use App\Models\Word;
+use App\Models\WordCategory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -174,8 +181,7 @@ class PadcastController extends Controller
             $fileName = $file->getClientOriginalName();
             $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
 
-            if($request->hasFile('file'))
-            {
+            if ($request->hasFile('file')) {
                 if (!File::exists($pathFile)) {
                     File::makeDirectory($pathFile, 0777, true);
                 }
@@ -183,7 +189,7 @@ class PadcastController extends Controller
                 $path_file = "uploads/padcast/$fileName";
             }
 
-            $sizeFile=File::size($path_file);
+            $sizeFile = File::size($path_file);
 
             $getID3 = new \getID3;
             $video_file = $getID3->analyze($path_file);
@@ -229,10 +235,9 @@ class PadcastController extends Controller
     public function updatePadcast(Request $request, $id)
     {
         // Validate the request input
-        $this->validate($request,[
+        $this->validate($request, [
             'name' => 'required|string|max:255',
-            'text' => 'string',
-            'padcastCategory_id'=> 'required'
+            'file' => 'required'
         ]);
 
         try {
@@ -242,8 +247,7 @@ class PadcastController extends Controller
             $fileName = $file->getClientOriginalName();
             $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
 
-            if($request->hasFile('file'))
-            {
+            if ($request->hasFile('file')) {
                 if (!File::exists($pathFile)) {
                     File::makeDirectory($pathFile, 0777, true);
                 }
@@ -251,7 +255,7 @@ class PadcastController extends Controller
                 $path_file = "uploads/padcast/$fileName";
             }
 
-            $sizeFile=File::size($path_file);
+            $sizeFile = File::size($path_file);
 
             $getID3 = new \getID3;
             $video_file = $getID3->analyze($path_file);
@@ -274,13 +278,14 @@ class PadcastController extends Controller
                 $padcast->text = $request->input('text');
             }
             if ($request->has('padcastCategory_id')) {
-                $padcast->text = $request->input('text');
+                $padcast->padcastCategory_id = $request->input('padcastCategory_id');
+            }
+            if ($request->has('file')) {
+                $padcast->file_path = $path_file;
             }
 
             $padcast->time = $duration;
-            $padcast->file_path = $path_file;
             $padcast->bulk = $this->formatBytes($sizeFile);
-
             $padcast->save();
 
             DB::commit();
@@ -289,7 +294,7 @@ class PadcastController extends Controller
 
         } catch (\Exception $exception) {
             DB::rollBack();
-            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+            return $this->sendJsonResponse([], $exception, $this->getStatusCodeByCodeName('Internal Server Error'));
         }
     }
 
@@ -311,8 +316,7 @@ class PadcastController extends Controller
 
             return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
@@ -323,7 +327,55 @@ class PadcastController extends Controller
         $base = log($size, 1024);
         $suffixes = array('', 'K', 'M', 'G', 'T');
 
-        return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)];
+        return round(pow(1024, $base - floor($base)), $precision) . ' ' . $suffixes[floor($base)];
+    }
+
+    public function multiDelete(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $type = $request->type;
+            $id = $request->id; // Expecting an array of IDs
+
+            if (!is_array($id) || empty($id)) {
+                return response()->json(['error' => 'IDs must be a non-empty array'], 400);
+            }
+
+            if ($type === "padcast") {
+                Padcast::whereIn('id', $id)->delete();
+            }
+            elseif ($type === "music") {
+                Music::whereIn('id', $id)->delete();
+            }
+            elseif ($type === "wordCategory") {
+                WordCategory::whereIn('id', $id)->delete();
+            }
+            elseif ($type === "word") {
+                Word::whereIn('id', $id)->delete();
+            }
+            elseif ($type === "subscription") {
+                Subscription::whereIn('id', $id)->delete();
+            }
+            elseif ($type === "bookCategory") {
+                BookCategory::whereIn('id', $id)->delete();
+            }
+            elseif ($type === "book") {
+                Book::whereIn('id', $id)->delete();
+            }
+            elseif ($type === "BookSeason") {
+                BookSeason::whereIn('id', $id)->delete();
+            }
+            else {
+                return response()->json(['error' => 'Invalid type'], 400);
+            }
+            DB::commit();
+
+            return $this->sendJsonResponse(null, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+        } catch (\Exception $exception)
+        {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
     }
 
 }
