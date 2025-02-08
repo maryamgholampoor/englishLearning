@@ -22,4 +22,8 @@ class BookSeason extends Model
 
     protected $table='book_season';
 
+    public function book()
+    {
+        return $this->belongsTo(BookSeason::class,'book_id');
+    }
 }

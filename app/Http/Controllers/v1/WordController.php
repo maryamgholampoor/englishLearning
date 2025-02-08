@@ -11,6 +11,7 @@ use App\Models\WordCategory;
 use App\Models\WordUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class WordController extends Controller
 {
@@ -30,14 +31,26 @@ class WordController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|string',
-            'word_count' => 'required|string'
         ]);
         try {
             // Start a transaction
             DB::beginTransaction();
+
+            $image = $request->file('image');
+            $fileName = $image->getClientOriginalName();
+            $path = app()->basePath('public/uploads/wordCat' . DIRECTORY_SEPARATOR);
+
+            if ($request->hasFile('image')) {
+                if (!File::exists($path)) {
+                    File::makeDirectory($path, 0777, true);
+                }
+                $image->move($path, $fileName);
+                $path_file = "uploads/word/$fileName";
+            }
+
             $wordCategory = new WordCategory();
             $wordCategory->name = $request->name;
-            $wordCategory->word_count = $request->word_count;
+            $wordCategory->image_path = $path_file;
             $wordCategory->save();
             DB::commit();
 
@@ -54,14 +67,25 @@ class WordController extends Controller
 
         $this->validate($request, [
             'name' => 'required|string',
-            'word_count' => 'required|string'
         ]);
         try {
-            // Start a transaction
+
+            $image = $request->file('image');
+            $fileName = $image->getClientOriginalName();
+            $path = app()->basePath('public/uploads/wordCat' . DIRECTORY_SEPARATOR);
+
+            if ($request->hasFile('image')) {
+                if (!File::exists($path)) {
+                    File::makeDirectory($path, 0777, true);
+                }
+                $image->move($path, $fileName);
+                $path_file = "uploads/word/$fileName";
+            }
+
             DB::beginTransaction();
             $wordCategory = WordCategory::find($id);
             $wordCategory->name = $request->name;
-            $wordCategory->word_count = $request->word_count;
+            $wordCategory->image_path = $path_file;
             $wordCategory->save();
             DB::commit();
 

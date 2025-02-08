@@ -221,7 +221,7 @@ class PadcastController extends Controller
     public function showPadcast()
     {
         try {
-            $padcast = Padcast::get();
+            $padcast = Padcast::with('padcastCategory')->get();
             DB::commit();
 
             return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));

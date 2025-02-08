@@ -11,4 +11,9 @@ class Padcast extends Model
 
   protected $table= 'padcast';
 
+    public function padcastCategory()
+    {
+        return $this->belongsTo(PadcastCategory::class,'padcastCategory_id');
+    }
+
 }
