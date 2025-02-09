@@ -167,6 +167,7 @@ class PadcastController extends Controller
 
     public function addPadcast(Request $request)
     {
+
         // Validate the request input
         $this->validate($request, [
             'name' => 'required|string|max:255',
@@ -206,11 +207,12 @@ class PadcastController extends Controller
             $padcast->padcastCategory_id = $request->input('padcastCategory_id');
             $padcast->save();
 
+            $podcasts=Padcast::where('id',$padcast->id)->with('padcastCategory')->first();
 
             // Commit the transaction
             DB::commit();
 
-            return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+            return $this->sendJsonResponse($podcasts, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
 
         } catch (\Exception $exception) {
             DB::rollBack();

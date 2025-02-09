@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Padcast extends Model
 {
-  use SoftDeletes;
+    use SoftDeletes;
 
-  protected $table= 'padcast';
+    protected $table = 'padcast';
 
     public function padcastCategory()
     {
-        return $this->belongsTo(PadcastCategory::class,'padcastCategory_id');
+        return $this->belongsTo(PadcastCategory::class, 'padcastCategory_id');
     }
 
 }
