@@ -31,8 +31,10 @@ class WordController extends Controller
     public function storeWordCategory(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|string',
+            'name' => ['required', 'string', 'max:255'],
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'], // Max 5MB
         ]);
+
         try {
             // Start a transaction
             DB::beginTransaction();
@@ -67,8 +69,10 @@ class WordController extends Controller
     {
 
         $this->validate($request, [
-            'name' => 'required|string',
+            'name' => ['required', 'string', 'max:255'],
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'], // Max 5MB
         ]);
+
         try {
 
             $image = $request->file('image');
@@ -121,8 +125,8 @@ class WordController extends Controller
         $user_id = $request->user_id;
 
         $this->validate($request, [
-            'word_category_id' => 'required|integer',
-            'user_id'=>'required|integer'
+            'word_category_id' => ['required', 'integer', 'exists:word_category,id'],
+            'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);
 
         try {

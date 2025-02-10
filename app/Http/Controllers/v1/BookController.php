@@ -370,8 +370,8 @@ class BookController extends Controller
         $user_id = $request->user_id;
 
         $this->validate($request, [
-            'user_id' => 'required|integer',
-            'book_id' => 'required|integer',
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'book_id' => ['required', 'integer', 'exists:book,id'],
         ]);
 
         try {
@@ -404,8 +404,8 @@ class BookController extends Controller
         $user_id = $request->user_id;
 
         $this->validate($request, [
-            'user_id' => 'required|integer',
-            'book_id' => 'required|integer',
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'book_id' => ['required', 'integer', 'exists:book,id'],
         ]);
 
         try {
@@ -425,7 +425,7 @@ class BookController extends Controller
 
     }
 
-    public function showBookmark(Request $request, $user_id)
+    public function showBookmark($user_id)
     {
         try {
             DB::beginTransaction();

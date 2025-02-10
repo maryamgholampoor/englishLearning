@@ -170,14 +170,17 @@ class PadcastController extends Controller
 
         // Validate the request input
         $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'file' => 'required'
+            'name' => ['required', 'string', 'max:255'],
+            'file' => ['required', 'file', 'mimes:mp3,wav,aac,oog,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
+            'padcastCategory_id' => ['required', 'integer', 'exists:padcast_category,id'],
+            'text'=>['string']
         ]);
 
         try {
             // Start a transaction
             DB::beginTransaction();
 
+            $padcastCategory_id=$request->input('padcastCategory_id');
             $file = $request->file('file');
             $fileName = $file->getClientOriginalName();
             $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
@@ -204,7 +207,7 @@ class PadcastController extends Controller
             $padcast->time = $duration;
             $padcast->bulk = $this->formatBytes($sizeFile);
             $padcast->file_path = $path_file;
-            $padcast->padcastCategory_id = $request->input('padcastCategory_id');
+            $padcast->padcastCategory_id = $padcastCategory_id;
             $padcast->save();
 
             $podcasts=Padcast::where('id',$padcast->id)->with('padcastCategory')->first();
@@ -223,7 +226,7 @@ class PadcastController extends Controller
     public function showPadcast(Request $request)
     {
         $this->validate($request, [
-            'category_id' => 'integer',
+            'integer, exists:padcast_category,id',
         ]);
 
         $category_id=$request->input('category_id');
@@ -319,15 +322,11 @@ class PadcastController extends Controller
             $padcast = Padcast::find($id);
 
             if ($padcast) {
-
                 $padcast->delete();
-
             } else {
                 return $this->sendJsonResponse([], trans('Not Found'), $this->getStatusCodeByCodeName('OK'));
             }
-
             DB::commit();
-
             return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
         } catch (\Exception $exception) {
