@@ -253,8 +253,10 @@ class PadcastController extends Controller
     {
         // Validate the request input
         $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'file' => 'required'
+            'name' => ['required', 'string', 'max:255'],
+            'file' => ['required', 'file', 'mimes:mp3,wav,aac,ogg,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
+            'padcastCategory_id' => ['required', 'integer', 'exists:padcast_category,id'],
+            'text'=>['string']
         ]);
 
         try {

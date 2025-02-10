@@ -430,7 +430,7 @@ class BookController extends Controller
         try {
             DB::beginTransaction();
 
-            $bookmark = Bookmark::with('user')->where('user_id', $user_id)->get();
+            $bookmark = Bookmark::with('user','book')->where('user_id', $user_id)->get();
 
             DB::commit();
             return $this->sendJsonResponse($bookmark, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
