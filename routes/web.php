@@ -41,6 +41,8 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('showProfile', ['as' => 'users.showProfile', 'uses' => "UsersController@showProfile"]);
             $router->post('deleteUser', ['as' => 'users.delete', 'uses' => "UsersController@deleteUser"]);
             $router->post('editUsers', ['as' => 'users.edit', 'uses' => "UsersController@editUsers"]);
+            $router->post('editProfile', ['as' => 'users.edit', 'uses' => "UsersController@updateProfile"]);
+
         });
 
         $router->group(['prefix' => 'subscription'], function () use ($router) {

@@ -154,10 +154,9 @@ class WordController extends Controller
       $user_id=$request->user_id;
       $word_id=$request->word_id;
 
-
         $this->validate($request, [
-            'user_id' => 'required|integer',
-            'word_id' => 'required|integer'
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'word_id' => ['integer', 'exists:word,id']
         ]);
 
         try {
@@ -193,7 +192,7 @@ class WordController extends Controller
         $word_category_id = $request->word_category_id;
 
         $this->validate($request, [
-            'word_category_id' => 'required|string',
+            'word_category_id' => ['required', 'integer', 'exists:word_category,id'],
         ]);
 
         try {
@@ -222,7 +221,7 @@ class WordController extends Controller
         $word_id = $request->word_id;
 
         $this->validate($request, [
-            'word_id' => 'required',
+            'word_id' => ['required', 'integer', 'exists:word,id'],
         ]);
 
         try {
