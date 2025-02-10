@@ -31,7 +31,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->delete('deletePadcastCategory/{id}', ['as' => 'padcast.delete', 'uses' => "PadcastController@deletePadcastCategory"]);
 
             $router->post('addPadcast', ['as' => 'padcast.add', 'uses' => "PadcastController@addPadcast"]);
-            $router->get('showPadcast', ['as' => 'padcast.show', 'uses' => "PadcastController@showPadcast"]);
+            $router->post('showPadcast', ['as' => 'padcast.show', 'uses' => "PadcastController@showPadcast"]);
             $router->post('updatePadcast/{id}', ['as' => 'padcast.update', 'uses' => "PadcastController@updatePadcast"]);
             $router->delete('deletePadcast/{id}', ['as' => 'padcast.delete', 'uses' => "PadcastController@deletePadcast"]);
         });

@@ -220,10 +220,22 @@ class PadcastController extends Controller
         }
     }
 
-    public function showPadcast()
+    public function showPadcast(Request $request)
     {
+        $this->validate($request, [
+            'category_id' => 'integer',
+        ]);
+
+        $category_id=$request->input('category_id');
+
         try {
-            $padcast = Padcast::with('padcastCategory')->get();
+            if(isset($category_id))
+            {
+                $padcast = Padcast::with('padcastCategory')->where('padcastCategory_id',$category_id)->get();
+            }
+            else {
+                $padcast = Padcast::with('padcastCategory')->get();
+            }
             DB::commit();
 
             return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));

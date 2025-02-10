@@ -12,6 +12,7 @@ use App\Models\WordUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use function Laravel\Prompts\select;
 
 class WordController extends Controller
 {
@@ -148,17 +149,18 @@ class WordController extends Controller
     {
       $user_id=$request->user_id;
       $word_id=$request->word_id;
-      $category_id=$request->category_id;
+
 
         $this->validate($request, [
             'user_id' => 'required|integer',
-            'word_id' => 'required|integer',
-            'category_id' => 'required|integer'
+            'word_id' => 'required|integer'
         ]);
 
         try {
             // Start a transaction
             DB::beginTransaction();
+            $words=Word::where('id',$word_id)->select('word_category_id')->get();
+            $category_id=$words[0]->word_category_id;
             $wordUser = WordUser::where('user_id',$user_id)->where('word_id',$word_id)->where('category_id',$category_id)->first();
             if(!$wordUser)
             {
