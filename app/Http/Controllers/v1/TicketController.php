@@ -28,12 +28,13 @@ class TicketController extends Controller
     public function addTicket(Request $request)
     {
         $this->validate($request, [
-            'subject' => 'required|string',
-            'ticket_text' => 'required|string',
-            'date' => 'required|date',
-            'user_id' => 'required|integer',
-            'category_id' => 'required|integer',
+            'subject'      => 'required|string|min:3|max:255',
+            'ticket_text'  => 'required|string|min:5|max:5000',
+            'date'         => 'required|date|after_or_equal:today',
+            'user_id'      => 'required|integer|exists:users,id',
+            'category_id'  => 'required|integer|exists:ticket_category,id',
         ]);
+
         try {
             // Start a transaction
             DB::beginTransaction();
@@ -57,12 +58,13 @@ class TicketController extends Controller
     public function editTicket(Request $request, $id)
     {
         $this->validate($request, [
-            'subject' => 'required|string',
-            'ticket_text' => 'required|string',
-            'date' => 'required|date',
-            'user_id' => 'required|integer',
-            'category_id' => 'required|integer',
+            'subject'      => 'required|string|min:3|max:255',
+            'ticket_text'  => 'required|string|min:5|max:5000',
+            'date'         => 'required|date|after_or_equal:today',
+            'user_id'      => 'required|integer|exists:users,id',
+            'category_id'  => 'required|integer|exists:ticket_category,id',
         ]);
+
         try {
             // Start a transaction
             DB::beginTransaction();
@@ -85,6 +87,10 @@ class TicketController extends Controller
 
     public function showUserTicket(Request $request)
     {
+        $this->validate($request, [
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
+
         try {
             $user_id = $request->user_id;
             $tickets = Ticket::where('user_id', $user_id)->get();
@@ -98,7 +104,7 @@ class TicketController extends Controller
         }
     }
 
-    public function showAllTickets(Request $request)
+    public function showAllTickets()
     {
         try {
             $tickets = Ticket::with('user')->get();
@@ -111,7 +117,6 @@ class TicketController extends Controller
         }
 
     }
-
 
 }
 

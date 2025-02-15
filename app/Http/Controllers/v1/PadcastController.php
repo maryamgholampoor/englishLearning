@@ -22,6 +22,7 @@ use App\Models\PadcastCategory;
 use App\Models\LoginCode;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class PadcastController extends Controller
@@ -40,7 +41,6 @@ class PadcastController extends Controller
 
     public function addPadcastCategory(Request $request)
     {
-
         // Validate the request input
         $this->validate($request, [
             'name' => 'required|string|max:255|unique:padcast_category,name',
@@ -348,6 +348,22 @@ class PadcastController extends Controller
 
     public function multiDelete(Request $request)
     {
+        $this->validate($request, [
+            'type' => [
+                'required',
+                'string',
+                Rule::in([
+                    'padcast', 'music', 'wordCategory', 'word', 'subscription',
+                    'bookCategory', 'book', 'BookSeason'
+                ]),
+            ],
+            'id' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+        ]);
+
         try {
             DB::beginTransaction();
             $type = $request->type;
@@ -387,6 +403,7 @@ class PadcastController extends Controller
             DB::commit();
 
             return $this->sendJsonResponse(null, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+
         } catch (\Exception $exception)
         {
             DB::rollBack();

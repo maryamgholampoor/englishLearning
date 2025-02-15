@@ -36,6 +36,15 @@ class LoginController extends Controller
 
     public function doLogin(Request $request)
     {
+        $this->validate($request, [
+            'mobile_number' => [
+                'required',
+                'string',
+                'regex:/^(\+98|0)?9\d{9}$/',
+                'unique:users,mobile_number',
+            ],
+        ]);
+
         DB::beginTransaction();
         try {
             $user = User::where('mobile_number',$request->mobile_number)->first();
@@ -60,8 +69,20 @@ class LoginController extends Controller
     public function checkLoginCode(Request $request)
     {
         // Check validation
+        $this->rules = [
+            'code' => [
+                'required',
+                'string',
+                'size:5',
+                'regex:/^\d{5}$/',
+            ],
+            'user_id' => [
+                'required',
+                'integer',
+                'exists:users,id',
+            ],
+        ];
 
-        $this->rules = ['code' => 'required|string|max:5', 'user_id' => 'required|integer'];
         if (!$this->validateRequest($request->all())) {
             return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
         }
@@ -112,11 +133,20 @@ class LoginController extends Controller
     {
         // Validate request
         $this->validate($request, [
-            'email' => 'required|email',
-            'password' => 'required'
+            'email' => [
+                'required',
+                'email:rfc,dns',
+                'max:255',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8', // Enforces a minimum length for security
+                'max:64', // Prevents excessively long passwords
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+            ],
         ]);
 
-        // Find admin by email
         $admin = Admin::where('email', $request->email)->first();
 
         if (!$admin || !Hash::check($request->password, $admin->password)) {

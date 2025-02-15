@@ -19,7 +19,14 @@ class UploadApplication extends Controller
     public function uploadApplication(Request $request)
     {
         // Validate the request input
-
+        $this->validate($request, [
+            'file' => [
+                'required',
+                'file',
+                'mimes:apk,ipa',
+                'max:50000',
+            ],
+        ]);
         try {
             DB::beginTransaction();
             $App=new App();
