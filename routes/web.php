@@ -21,7 +21,6 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
         $router->group(['prefix' => 'auth'], function () use ($router) {
             $router->post('login', ['as' => 'login', 'uses' => "LoginController@doLogin"]);
             $router->post('login/code', ['as' => 'login.code', 'uses' => "LoginController@checkLoginCode"]);
-            $router->post('login/code', ['as' => 'login.code', 'uses' => "LoginController@checkLoginCode"]);
         });
 
         $router->group(['prefix' => 'padcast'], function () use ($router) {

@@ -42,18 +42,36 @@ trait Request
      * @param $patternCodeId
      * @return bool
      */
-    public function sendMessageRegisterCompleted($mobile, $text, $patternCodeId)
+    public function sendMessageRegisterCompleted($user, $code, $patternCodeId)
     {
-        $url = env('SMS_PANEL_URL');
-        $url = $url . "?" . "Token=" . env('SMS_TOKEN');
-        $url = $url . "&" . "PatternValues=" . urlencode($text);
-        $url = $url . "&" . "Mobile=$mobile";
-        $url = $url . "&" . "PatternCodeID=$patternCodeId";
-        $json = file_get_contents($url);
+//        $url = env('SMS_PANEL_URL');
+//        $url = $url . "?" . "Token=" . env('SMS_TOKEN');
+//        $url = $url . "&" . "PatternValues=" . urlencode($text);
+//        $url = $url . "&" . "Mobile=$mobile";
+//        $url = $url . "&" . "PatternCodeID=$patternCodeId";
+//        $json = file_get_contents($url);
+//        $result = json_decode($json);
+//
+
+        $url = "https://portal.amootsms.com/rest/SendWithPattern";
+
+        $params = [
+            "Token" => "8AADD086A29A2C589E380BE2D9BE20822D403B38",
+            "PatternValues" => "$user->name,$code",
+            "Mobile" => $user->mobile_number,
+            "PatternCodeID" => $patternCodeId
+        ];
+// "3233"
+        $finalUrl = $url . "?" . http_build_query($params);
+
+        $json = file_get_contents($finalUrl);
         $result = json_decode($json);
+
         if ($result->Status == 'Failed') {
-            return false;
+            throw new \Exception('The result of send otp code has error, data is: ' . $result->Data);
         }
+
         return true;
+
     }
 }

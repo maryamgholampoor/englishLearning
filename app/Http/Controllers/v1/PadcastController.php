@@ -266,7 +266,8 @@ class PadcastController extends Controller
             $fileName = $file->getClientOriginalName();
             $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
 
-            if ($request->hasFile('file')) {
+            if ($request->hasFile('file'))
+            {
                 if (!File::exists($pathFile)) {
                     File::makeDirectory($pathFile, 0777, true);
                 }
@@ -287,8 +288,6 @@ class PadcastController extends Controller
                 File::makeDirectory($pathFile, 0777, true);
             }
 
-            $file->move($pathFile, $fileName);
-            $path_file = "uploads/padcast/$fileName";
 
             if ($request->has('name')) {
                 $padcast->name = $request->input('name');
@@ -307,11 +306,13 @@ class PadcastController extends Controller
             $padcast->bulk = $this->formatBytes($sizeFile);
             $padcast->save();
 
+
             DB::commit();
 
             return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        } catch (\Exception $exception) {
+        } catch (\Exception $exception)
+        {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception, $this->getStatusCodeByCodeName('Internal Server Error'));
         }

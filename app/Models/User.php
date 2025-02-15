@@ -21,9 +21,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
 
 
+//
+//    protected $fillable = [
+//        'name', 'email'
+//    ];
 
     protected $fillable = [
-        'name', 'email'
+        'mobile_number', 'user_status'
     ];
 
     protected $table= 'users';
@@ -39,4 +43,18 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     const USER_ACTIVE = 1;
     const USER_DEACTIVE = 0;
+    const USER_Registered = 2;
+
+
+
+
+    /**
+     * @param $query
+     * @param $mobile
+     * @return mixed
+     */
+    public function scopeFindByMobile($query, $mobile)
+    {
+        return $query->where('mobile_number', '=', $mobile);
+    }
 }

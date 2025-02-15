@@ -36,58 +36,38 @@ class LoginController extends Controller
 
     public function doLogin(Request $request)
     {
-
-        $url = "https://portal.amootsms.com/rest/SendWithPattern";
-
-        $url = $url."?"."Token=".urlencode("8AADD086A29A2C589E380BE2D9BE20822D403B38");
-        $url = $url."&"."Mobile=09038231952";
-        $url = $url."&"."PatternCodeID=2844";
-        $url = $url."&"."PatternValues=user_name,code";
-
-        $json = file_get_contents($url);
-        return $json;
-
-//      $result = json_decode($json);
-//      echo $result->Status;
-
-//        if (!$this->validateRequest($request->all()))
-//        {
-//            return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
-//        }
-//
-//        // Insert data
-//        DB::beginTransaction();
-//        try {
-//            // Check mobile number exist
-//            $user = User::where('mobile_number',$request->mobile_number)->first();
-//            if (!$user) {
-//                $user = User::create(['mobile_number' => $request->mobile_number, 'user_status' => User::USER_ACTIVE]);
-//            }
-//            // Create login code and send it
-//            $code = $this->randomDigits(5);
-//            $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
-//            LoginCode::create(['code' => $code, 'user_id' => $user->id, 'expiration_time' => $expiration]);
-//           return $this->sendLoginCode($request->mobile_number, $code);
-//            // Commit transaction
-//            DB::commit();
-//            // Return response
-//            return $this->sendJsonResponse(['user' => $user], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
-//        } catch (\Exception $exception) {
-//            DB::rollBack();
-//            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
-//        }
+        DB::beginTransaction();
+        try {
+            $user = User::where('mobile_number',$request->mobile_number)->first();
+            if (!$user) {
+                $user = User::create(['mobile_number' => $request->mobile_number, 'user_status' => User::USER_ACTIVE]);
+            }
+            // Create login code and send it
+            $code = $this->randomDigits(5);
+            $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
+            LoginCode::create(['code' => $code, 'user_id' => $user->id, 'expiration_time' => $expiration]);
+            $this->sendMessageRegisterCompleted($user , $code ,"3233");
+            // Commit transaction
+            DB::commit();
+            // Return response
+            return $this->sendJsonResponse(['user' => $user], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
     }
 
     public function checkLoginCode(Request $request)
     {
         // Check validation
+
         $this->rules = ['code' => 'required|string|max:5', 'user_id' => 'required|integer'];
         if (!$this->validateRequest($request->all())) {
             return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
         }
         // Check code
         try {
-            $result = LoginCode::findByCode($request->user_id, $request->code, date('Y-m-d H:i:s'))->first();
+            $result = LoginCode::where('user_id',$request->user_id)->where('code',$request->code)->first();
             if (!$result) {
                 return $this->sendJsonResponse([], trans('message.there_is_no_login_code_with_specific'), $this->getStatusCodeByCodeName('Bad Request'));
             }
@@ -97,7 +77,18 @@ class LoginController extends Controller
             // Redirect to register form or panel form
             //$userRegistered = !($result->user->user_type == User::USER_TYPE_TEMPORARY);
             // Generate Token if needed
-            $token = JWTAuth::fromUser($result->user);
+
+//            $token = JWTAuth::fromUser($result->user);
+
+            // Generate JWT Token
+            $payload = [
+                'iss' => "lumen-jwt", // Issuer of the token
+                'sub' => $request->user_id, // Subject of the token (admin ID)
+                'iat' => time(), // Issued at
+                'exp' => time() + 60 * 60 // Token expiration time (1 hour)
+            ];
+
+            $token = JWT::encode($payload, $this->jwt_secret, 'HS256');
             // Return response
             return $this->sendJsonResponse([ 'token' => $token, 'token_type' => 'bearer'], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
         } catch (\Exception $exception) {
