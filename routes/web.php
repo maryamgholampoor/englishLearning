@@ -78,7 +78,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('addTicket', ['as' => 'ticket.add', 'uses' => 'TicketController@addTicket']);
             $router->post('editTicket/{id}', ['as' => 'ticket.edit', 'uses' => 'TicketController@editTicket']);
             $router->get('showAllTickets', ['as' => 'ticket.show', 'uses' => 'TicketController@showAllTickets']);
-            $router->get('showUserTicket', ['as' => 'ticket.showUser', 'uses' => 'TicketController@showUserTicket']);
+            $router->post('showUserTicket', ['as' => 'ticket.showUser', 'uses' => 'TicketController@showUserTicket']);
         });
 
         $router->group(['prefix' => 'admin'], function () use ($router) {
