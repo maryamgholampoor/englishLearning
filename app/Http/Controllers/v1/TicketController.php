@@ -93,10 +93,10 @@ class TicketController extends Controller
 
         try {
             $user_id = $request->user_id;
-            $tickets = Ticket::where('user_id', $user_id)->get();
+            $tickets = Ticket::where('user_id', $user_id)->with('ticketCategory')->get();
             DB::commit();
 
-            return $this->sendJsonResponse($tickets, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+            return $this->sendJsonResponse($tickets, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
         }
         catch (\Exception $exception) {
             DB::rollBack();

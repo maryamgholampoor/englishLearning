@@ -35,6 +35,8 @@ class LoginController extends Controller
 
     }
 
+    protected $jwt_secret="ojoijoiiiji";
+
     public function doLogin(Request $request)
     {
         $this->validate($request, [
@@ -139,7 +141,7 @@ class LoginController extends Controller
                 'string',
                 'min:8', // Enforces a minimum length for security
                 'max:64', // Prevents excessively long passwords
-//                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
             ],
         ]);
 
@@ -159,11 +161,8 @@ class LoginController extends Controller
 
         $token = JWT::encode($payload, $this->jwt_secret, 'HS256');
 
-        return response()->json([
-            'message' => 'Login successful',
-            'token' => $token,
-            'admin' => $admin
-        ]);
+        return $this->sendJsonResponse(['token' => $token,'admin'=>$admin], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+
     }
 
     private function getAuthenticatedAdmin($request)
