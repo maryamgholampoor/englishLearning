@@ -30,7 +30,7 @@ class TicketController extends Controller
         $this->validate($request, [
             'subject'      => 'required|string|min:3|max:255',
             'ticket_text'  => 'required|string|min:5|max:5000',
-            'date'         => 'required|date|after_or_equal:today',
+            'date'         => 'required|date',
             'user_id'      => 'required|integer|exists:users,id',
             'category_id'  => 'required|integer|exists:ticket_category,id',
         ]);
@@ -60,7 +60,7 @@ class TicketController extends Controller
         $this->validate($request, [
             'subject'      => 'required|string|min:3|max:255',
             'ticket_text'  => 'required|string|min:5|max:5000',
-            'date'         => 'required|date|after_or_equal:today',
+            'date'         => 'required|date',
             'user_id'      => 'required|integer|exists:users,id',
             'category_id'  => 'required|integer|exists:ticket_category,id',
         ]);

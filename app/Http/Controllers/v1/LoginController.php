@@ -17,6 +17,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Validator;
 
 
 class LoginController extends Controller
@@ -41,7 +42,6 @@ class LoginController extends Controller
                 'required',
                 'string',
                 'regex:/^(\+98|0)?9\d{9}$/',
-                'unique:users,mobile_number',
             ],
         ]);
 
@@ -88,18 +88,16 @@ class LoginController extends Controller
         }
         // Check code
         try {
+            $users = User::where('id',$request->user_id)->first();
+
             $result = LoginCode::where('user_id',$request->user_id)->where('code',$request->code)->first();
             if (!$result) {
                 return $this->sendJsonResponse([], trans('message.there_is_no_login_code_with_specific'), $this->getStatusCodeByCodeName('Bad Request'));
             }
+
             // Save result
             $result->used_time = date('Y-m-d H:i:s');
             $result->save();
-            // Redirect to register form or panel form
-            //$userRegistered = !($result->user->user_type == User::USER_TYPE_TEMPORARY);
-            // Generate Token if needed
-
-//            $token = JWTAuth::fromUser($result->user);
 
             // Generate JWT Token
             $payload = [
@@ -111,7 +109,7 @@ class LoginController extends Controller
 
             $token = JWT::encode($payload, $this->jwt_secret, 'HS256');
             // Return response
-            return $this->sendJsonResponse([ 'token' => $token, 'token_type' => 'bearer'], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+            return $this->sendJsonResponse(['users'=> $users ,'token' => $token, 'token_type' => 'bearer'], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
         } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
@@ -126,8 +124,6 @@ class LoginController extends Controller
         }
         return $result;
     }
-
-    private $jwt_secret = "your_secret_key"; // Change this to a strong secret key
 
     public function login(Request $request)
     {
@@ -168,16 +164,6 @@ class LoginController extends Controller
             'token' => $token,
             'admin' => $admin
         ]);
-    }
-
-    public function profile(Request $request)
-    {
-        $admin = $this->getAuthenticatedAdmin($request);
-        if (!$admin) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return response()->json($admin);
     }
 
     private function getAuthenticatedAdmin($request)

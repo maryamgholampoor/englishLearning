@@ -7,7 +7,6 @@ use App\Http\Utilities\Request as UtilityRequest;
 use App\Http\Utilities\Response;
 use App\Http\Utilities\StatusCode;
 use App\Models\App;
-use App\Models\Padcast;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -23,10 +22,10 @@ class UploadApplication extends Controller
             'file' => [
                 'required',
                 'file',
-                'mimes:apk,ipa',
                 'max:50000',
             ],
         ]);
+
         try {
             DB::beginTransaction();
             $App=new App();
