@@ -139,7 +139,7 @@ class LoginController extends Controller
                 'string',
                 'min:8', // Enforces a minimum length for security
                 'max:64', // Prevents excessively long passwords
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
+//                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/',
             ],
         ]);
 

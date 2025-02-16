@@ -397,9 +397,7 @@ class PadcastController extends Controller
             elseif ($type === "BookSeason") {
                 BookSeason::whereIn('id', $id)->delete();
             }
-            else {
-                return response()->json(['error' => 'Invalid type'], 400);
-            }
+
             DB::commit();
 
             return $this->sendJsonResponse(null, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));

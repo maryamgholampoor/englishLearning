@@ -107,7 +107,7 @@ class TicketController extends Controller
     public function showAllTickets()
     {
         try {
-            $tickets = Ticket::with('user')->get();
+            $tickets = Ticket::with('user','ticketCategory')->get();
             DB::commit();
 
             return $this->sendJsonResponse($tickets, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));

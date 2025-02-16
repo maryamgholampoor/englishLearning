@@ -26,6 +26,11 @@ class Ticket extends Model
        return $this->belongsTo(User::class,'user_id');
     }
 
+    public function ticketCategory()
+    {
+        return $this->belongsTo(TicketCategory::class,'category_id');
+    }
+
 
 
 }
