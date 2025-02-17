@@ -84,7 +84,7 @@ class WordController extends Controller
                     File::makeDirectory($path, 0777, true);
                 }
                 $image->move($path, $fileName);
-                $path_file = "uploads/word/$fileName";
+                $path_file = "uploads/wordCat/$fileName";
             }
 
             DB::beginTransaction();
