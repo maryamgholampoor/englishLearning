@@ -60,7 +60,7 @@ class PadcastController extends Controller
                     File::makeDirectory($path, 0777, true);
                 }
                 $image->move($path, $fileName);
-                $path_file = "uploads/padcast/$fileName";
+                $path_file = "uploads/padcastCat/$fileName";
             }
             // Start a transaction
             DB::beginTransaction();
