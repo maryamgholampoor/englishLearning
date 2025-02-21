@@ -42,6 +42,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('deleteUser', ['as' => 'users.delete', 'uses' => "UsersController@deleteUser"]);
             $router->post('editUsers', ['as' => 'users.edit', 'uses' => "UsersController@editUsers"]);
             $router->post('editProfile', ['as' => 'users.edit', 'uses' => "UsersController@updateProfile"]);
+            $router->post('editProfilePicture/{id}', ['as' => 'users.edit', 'uses' => "UsersController@updateProfilePicture"]);
 
         });
 
@@ -74,11 +75,12 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
         });
 
         $router->group(['prefix' => 'ticket'], function () use ($router) {
-
             $router->post('addTicket', ['as' => 'ticket.add', 'uses' => 'TicketController@addTicket']);
             $router->post('editTicket/{id}', ['as' => 'ticket.edit', 'uses' => 'TicketController@editTicket']);
             $router->get('showAllTickets', ['as' => 'ticket.show', 'uses' => 'TicketController@showAllTickets']);
             $router->post('showUserTicket', ['as' => 'ticket.showUser', 'uses' => 'TicketController@showUserTicket']);
+            $router->post('changeTicketStatus', ['as' => 'ticket.showUser', 'uses' => 'TicketController@changeTicketStatus']);
+            $router->post('downloadFile/{id}', ['as' => 'ticket.showUser', 'uses' => 'TicketController@downloadFile']);
         });
 
         $router->group(['prefix' => 'admin'], function () use ($router) {
@@ -114,6 +116,15 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
 
         $router->group(['prefix' => 'delete'], function () use ($router) {
             $router->post('listDelete', ['as' => 'List.delete', 'uses' => 'PadcastController@multiDelete']);
+        });
+
+        $router->group(['prefix' => 'role'], function () use ($router) {
+            $router->get('/', ['as' => 'role.getAll', 'uses' => 'RoleController@getAllRoles']);
+            $router->post('addPerm', ['as' => 'role.create', 'uses' => 'RoleController@addRolePerm']);
+            $router->post('store', ['as' => 'role.store', 'uses' => 'RoleController@addRole']);
+            $router->post('edit/{id}', ['as' => 'role.edit', 'uses' => 'RoleController@editRole']);
+            $router->put('update/{id}', ['as' => 'role.update', 'uses' => 'RoleController@update']);
+            $router->delete('delete/{id}', ['as' => 'role.delete', 'uses' => 'RoleController@delete']);
         });
 
     });

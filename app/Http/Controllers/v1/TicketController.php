@@ -28,11 +28,11 @@ class TicketController extends Controller
     public function addTicket(Request $request)
     {
         $this->validate($request, [
-            'subject'      => 'required|string|min:3|max:255',
-            'ticket_text'  => 'required|string|min:5|max:5000',
-            'date'         => 'required|date',
-            'user_id'      => 'required|integer|exists:users,id',
-            'category_id'  => 'required|integer|exists:ticket_category,id',
+            'subject' => 'required|string|min:3|max:255',
+            'ticket_text' => 'required|string|min:5|max:5000',
+            'date' => 'required|date',
+            'user_id' => 'required|integer|exists:users,id',
+            'category_id' => 'required|integer|exists:ticket_category,id',
         ]);
 
         try {
@@ -58,11 +58,11 @@ class TicketController extends Controller
     public function editTicket(Request $request, $id)
     {
         $this->validate($request, [
-            'subject'      => 'required|string|min:3|max:255',
-            'ticket_text'  => 'required|string|min:5|max:5000',
-            'date'         => 'required|date',
-            'user_id'      => 'required|integer|exists:users,id',
-            'category_id'  => 'required|integer|exists:ticket_category,id',
+            'subject' => 'required|string|min:3|max:255',
+            'ticket_text' => 'required|string|min:5|max:5000',
+            'date' => 'required|date',
+            'user_id' => 'required|integer|exists:users,id',
+            'category_id' => 'required|integer|exists:ticket_category,id',
         ]);
 
         try {
@@ -97,8 +97,7 @@ class TicketController extends Controller
             DB::commit();
 
             return $this->sendJsonResponse($tickets, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
@@ -107,11 +106,49 @@ class TicketController extends Controller
     public function showAllTickets()
     {
         try {
-            $tickets = Ticket::with('user','ticketCategory')->get();
+            $tickets = Ticket::with('user', 'ticketCategory')->get();
             DB::commit();
 
             return $this->sendJsonResponse($tickets, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
         } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+
+    }
+
+    public function editTicketStatus(Request $request, $id)
+    {
+
+        $this->validate($request, [
+            'status' => 'required|integer',
+        ]);
+
+        $status = $request->status;
+
+        try {
+            // Start a transaction
+            DB::beginTransaction();
+            $ticket = Ticket::where('id', $id)->update(['status', $status]);
+            DB::commit();
+
+            return $this->sendJsonResponse($ticket, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+    }
+
+    public function downloadFile(Request $request, $id)
+    {
+        try {
+            $tickets = Ticket::where('id',$id)->select('file_path')->get();
+            DB::commit();
+
+            return $this->sendJsonResponse($tickets[0], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+        } catch (\Exception $exception)
+        {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }

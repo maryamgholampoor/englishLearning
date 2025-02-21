@@ -10,6 +10,8 @@ use App\Http\Utilities\StatusCode;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
+
 
 class UsersController extends Controller
 {
@@ -85,40 +87,41 @@ class UsersController extends Controller
 
     public function updateProfile(Request $request, $id)
     {
+        DB::beginTransaction();
+        try {
+
         $validator = Validator::make($request->all(), [
-            'mobile_number' => 'nullable|string|max:15',
+            'mobile_number' => 'nullable|string|min:11|max:11',
             'name'          => 'nullable|string|max:255',
             'last_name'     => 'nullable|string|max:255',
             'email'         => 'nullable|email|unique:users,email,' . $id,
             'birth_date'    => 'nullable|date',
             'sex'           => 'nullable|in:male,female,other',
-            'profile_pic'   => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
+            if (!$this->validateRequest($request->all())) {
+                return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
+            }
 
         $user = User::where('id', $id)->first();
         if (!$user) {
+            if (!$this->validateRequest($request->all())) {
+                return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Found'));
+            }
+
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        // مقادیر فقط در صورتی که مقدار جدیدی ارسال شده باشد، آپدیت شوند
         $user->update($request->except(['profile_pic']));
-
-        // آپلود تصویر پروفایل
-//        if ($request->hasFile('profile_pic')) {
-//            $profilePicPath = $request->file('profile_pic')->store('profile_pics', 'public');
-//            $user->profile_pic = $profilePicPath;
-//        }
-
         $user->save();
 
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'user' => $user
-        ], 200);
+        DB::commit();
+        return $this->sendJsonResponse($user, trans('message.user_updated_successfully'), $this->getStatusCodeByCodeName('OK'));
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
     }
 
     public function deleteUser(Request $request)
@@ -158,6 +161,51 @@ class UsersController extends Controller
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
     }
+
+    public function updateProfilePicture(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $validator = Validator::make($request->all(), [
+                'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendJsonResponse([], $validator->errors(), $this->getStatusCodeByCodeName('Not Acceptable'));
+            }
+
+            $users = User::where('id', $id)->first();
+            if (!$users) {
+                return $this->sendJsonResponse([], trans('message.user_not_found'), $this->getStatusCodeByCodeName('Not Found'));
+            }
+
+            $image = $request->file('profile_picture');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $path = app()->basePath('public/uploads/profile_pictures' . DIRECTORY_SEPARATOR);
+
+            if (!File::exists($path)) {
+                File::makeDirectory($path, 0777, true);
+            }
+
+            if ($users->profile_picture && File::exists(app()->basePath("public/{$users->profile_picture}"))) {
+                File::delete(app()->basePath("public/{$users->profile_picture}"));
+            }
+
+            $image->move($path, $fileName);
+            $path_file = "uploads/profile_pictures/$fileName";
+
+            $users->profile_pic = $path_file;
+            $users->save();
+
+            DB::commit();
+            return $this->sendJsonResponse(['profile_picture_url' => url($path_file)], trans('message.profile_picture_updated'), $this->getStatusCodeByCodeName('OK'));
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+    }
+
 
 //    public function updateProfile(Request $request)
 //    {
