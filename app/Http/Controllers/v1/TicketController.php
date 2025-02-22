@@ -129,10 +129,10 @@ class TicketController extends Controller
         try {
             // Start a transaction
             DB::beginTransaction();
-            $ticket = Ticket::where('id', $id)->update(['status', $status]);
+            $ticket = Ticket::where('id', $id)->update(['status'=>$status]);
             DB::commit();
 
-            return $this->sendJsonResponse($ticket, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+            return $this->sendJsonResponse([], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
         } catch (\Exception $exception) {
             DB::rollBack();

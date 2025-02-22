@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Utilities\Response;
 use App\Http\Utilities\StatusCode;
 use App\Http\Utilities\Request as UtilityRequest;
+use App\Models\PermAction;
 use App\Models\PermRole;
 use App\Models\PermRolePermission;
 use App\Models\PermSection;
@@ -102,8 +103,22 @@ class RoleController extends Controller
      */
     public function editRole(Request $request, $id)
     {
-        $role = PermRole::where('id',$id)->update(['title'=>$request->role_title]);
-        return $this->sendJsonResponse($role, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+        // Check validation
+        $this->rules = [
+            'role_title' => 'required|string|max:100|unique:perm_roles,title',
+        ];
+        if (!$this->validateRequest($request->all())) {
+            return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
+        }
+        try {
+            $role = PermRole::where('id',$id)->update(['title'=>$request->role_title]);
+            return $this->sendJsonResponse([], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+        }
+        catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+
     }
 
     public function delete(Request $request, $id)
@@ -195,6 +210,12 @@ class RoleController extends Controller
     {
         $role = PermRole::find($id);
         return $this->sendJsonResponse(['role' => $role], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+    }
+
+    public function getPermAction()
+    {
+        $permAction = PermAction::get();
+        return $this->sendJsonResponse(['permAction' => $permAction], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
     }
 
 

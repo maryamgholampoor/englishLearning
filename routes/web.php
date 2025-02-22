@@ -79,7 +79,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('editTicket/{id}', ['as' => 'ticket.edit', 'uses' => 'TicketController@editTicket']);
             $router->get('showAllTickets', ['as' => 'ticket.show', 'uses' => 'TicketController@showAllTickets']);
             $router->post('showUserTicket', ['as' => 'ticket.showUser', 'uses' => 'TicketController@showUserTicket']);
-            $router->post('changeTicketStatus', ['as' => 'ticket.showUser', 'uses' => 'TicketController@changeTicketStatus']);
+            $router->post('changeTicketStatus/{id}', ['as' => 'ticket.showUser', 'uses' => 'TicketController@editTicketStatus']);
             $router->post('downloadFile/{id}', ['as' => 'ticket.showUser', 'uses' => 'TicketController@downloadFile']);
         });
 
@@ -126,6 +126,11 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->put('update/{id}', ['as' => 'role.update', 'uses' => 'RoleController@update']);
             $router->delete('delete/{id}', ['as' => 'role.delete', 'uses' => 'RoleController@delete']);
         });
+
+        $router->group(['prefix' => 'permAction'], function () use ($router) {
+            $router->get('/', ['as' => 'permAction.getAll', 'uses' => 'RoleController@getPermAction']);
+        });
+
 
     });
 });

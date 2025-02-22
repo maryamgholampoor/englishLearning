@@ -91,7 +91,6 @@ class UsersController extends Controller
         try {
 
         $validator = Validator::make($request->all(), [
-            'mobile_number' => 'nullable|string|min:11|max:11',
             'name'          => 'nullable|string|max:255',
             'last_name'     => 'nullable|string|max:255',
             'email'         => 'nullable|email|unique:users,email,' . $id,
