@@ -46,7 +46,7 @@ class PadcastController extends Controller
             'name' => 'required|string|max:255|unique:padcast_category,name',
             'description' => 'required|string',
             'view_count' => 'integer',
-            'image' => 'required|file',
+            'image' => 'file',
             'type' => 'required|in:text,voice',
         ]);
 
@@ -171,7 +171,7 @@ class PadcastController extends Controller
         // Validate the request input
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
-            'file' => ['required', 'file', 'mimes:mp3,wav,aac,ogg,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
+            'file' => ['file', 'mimes:mp3,wav,aac,ogg,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
             'padcastCategory_id' => ['required', 'integer', 'exists:padcast_category,id'],
             'text'=>['string']
         ]);
@@ -254,7 +254,7 @@ class PadcastController extends Controller
         // Validate the request input
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
-            'file' => ['required', 'file', 'mimes:mp3,wav,aac,ogg,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
+            'file' => ['file', 'mimes:mp3,wav,aac,ogg,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
             'padcastCategory_id' => ['required', 'integer', 'exists:padcast_category,id'],
             'text'=>['string']
         ]);

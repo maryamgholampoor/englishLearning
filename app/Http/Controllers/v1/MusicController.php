@@ -52,7 +52,7 @@ class MusicController extends Controller
         $request->validate([
             'path' => 'required|file|mimes:mp3,wav',
             'text' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'music_category_id' => 'required|integer|exists:music_category,id',
         ]);
 

@@ -166,7 +166,7 @@ class UsersController extends Controller
         DB::beginTransaction();
         try {
             $validator = Validator::make($request->all(), [
-                'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'profile_picture' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -204,7 +204,6 @@ class UsersController extends Controller
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
     }
-
 
 //    public function updateProfile(Request $request)
 //    {
