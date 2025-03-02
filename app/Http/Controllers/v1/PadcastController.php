@@ -172,14 +172,14 @@ class PadcastController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'file' => ['file', 'mimes:mp3,wav,aac,ogg,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
             'padcastCategory_id' => ['required', 'integer', 'exists:padcast_category,id'],
-            'text'=>['string']
+            'text' => ['string']
         ]);
 
         try {
             // Start a transaction
             DB::beginTransaction();
 
-            $padcastCategory_id=$request->input('padcastCategory_id');
+            $padcastCategory_id = $request->input('padcastCategory_id');
             $file = $request->file('file');
             $fileName = $file->getClientOriginalName();
             $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
@@ -209,7 +209,7 @@ class PadcastController extends Controller
             $padcast->padcastCategory_id = $padcastCategory_id;
             $padcast->save();
 
-            $podcasts=Padcast::where('id',$padcast->id)->with('padcastCategory')->first();
+            $podcasts = Padcast::where('id', $padcast->id)->with('padcastCategory')->first();
 
             // Commit the transaction
             DB::commit();
@@ -228,14 +228,12 @@ class PadcastController extends Controller
             'integer, exists:padcast_category,id',
         ]);
 
-        $category_id=$request->input('category_id');
+        $category_id = $request->input('category_id');
 
         try {
-            if(isset($category_id))
-            {
-                $padcast = Padcast::with('padcastCategory')->where('padcastCategory_id',$category_id)->get();
-            }
-            else {
+            if (isset($category_id)) {
+                $padcast = Padcast::with('padcastCategory')->where('padcastCategory_id', $category_id)->get();
+            } else {
                 $padcast = Padcast::with('padcastCategory')->get();
             }
             DB::commit();
@@ -255,14 +253,13 @@ class PadcastController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'file' => ['file', 'max:10240'], // Max 10MB file, only audio formats
             'padcastCategory_id' => ['required', 'integer', 'exists:padcast_category,id'],
-            'text'=>['string']
+            'text' => ['string']
         ]);
 
         try {
             DB::beginTransaction();
 
-            if ($request->hasFile('file'))
-            {
+            if ($request->hasFile('file')) {
                 $file = $request->file('file');
                 $fileName = $file->getClientOriginalName();
                 $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
@@ -272,14 +269,15 @@ class PadcastController extends Controller
                 }
                 $file->move($pathFile, $fileName);
                 $path_file = "uploads/padcast/$fileName";
+
+
+                $sizeFile = File::size($path_file);
+
+                $getID3 = new \getID3;
+                $video_file = $getID3->analyze($path_file);
+                $duration_seconds = $video_file['playtime_seconds'];
+                $duration = date('H:i:s', $duration_seconds);
             }
-
-            $sizeFile = File::size($path_file);
-
-            $getID3 = new \getID3;
-            $video_file = $getID3->analyze($path_file);
-            $duration_seconds = $video_file['playtime_seconds'];
-            $duration = date('H:i:s', $duration_seconds);
 
             $padcast = Padcast::find($id);
 
@@ -300,9 +298,12 @@ class PadcastController extends Controller
             if ($request->has('file')) {
                 $padcast->file_path = $path_file;
             }
-
-            $padcast->time = $duration;
-            $padcast->bulk = $this->formatBytes($sizeFile);
+            if($duration != null){
+                $padcast->time = $duration;
+            }
+            if($sizeFile != null){
+                $padcast->bulk = $this->formatBytes($sizeFile);
+            }
             $padcast->save();
 
 
@@ -310,8 +311,7 @@ class PadcastController extends Controller
 
             return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        } catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception, $this->getStatusCodeByCodeName('Internal Server Error'));
         }
@@ -374,26 +374,19 @@ class PadcastController extends Controller
 
             if ($type === "padcast") {
                 Padcast::whereIn('id', $id)->delete();
-            }
-            elseif ($type === "music") {
+            } elseif ($type === "music") {
                 Music::whereIn('id', $id)->delete();
-            }
-            elseif ($type === "wordCategory") {
+            } elseif ($type === "wordCategory") {
                 WordCategory::whereIn('id', $id)->delete();
-            }
-            elseif ($type === "word") {
+            } elseif ($type === "word") {
                 Word::whereIn('id', $id)->delete();
-            }
-            elseif ($type === "subscription") {
+            } elseif ($type === "subscription") {
                 Subscription::whereIn('id', $id)->delete();
-            }
-            elseif ($type === "bookCategory") {
+            } elseif ($type === "bookCategory") {
                 BookCategory::whereIn('id', $id)->delete();
-            }
-            elseif ($type === "book") {
+            } elseif ($type === "book") {
                 Book::whereIn('id', $id)->delete();
-            }
-            elseif ($type === "BookSeason") {
+            } elseif ($type === "BookSeason") {
                 BookSeason::whereIn('id', $id)->delete();
             }
 
@@ -401,8 +394,7 @@ class PadcastController extends Controller
 
             return $this->sendJsonResponse(null, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
-        } catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
