@@ -167,7 +167,6 @@ class PadcastController extends Controller
 
     public function addPadcast(Request $request)
     {
-
         // Validate the request input
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
@@ -254,7 +253,7 @@ class PadcastController extends Controller
         // Validate the request input
         $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
-            'file' => ['file', 'mimes:mp3,wav,aac,ogg,flac,wma,m4a', 'max:10240'], // Max 10MB file, only audio formats
+            'file' => ['file', 'max:10240'], // Max 10MB file, only audio formats
             'padcastCategory_id' => ['required', 'integer', 'exists:padcast_category,id'],
             'text'=>['string']
         ]);
@@ -262,12 +261,12 @@ class PadcastController extends Controller
         try {
             DB::beginTransaction();
 
-            $file = $request->file('file');
-            $fileName = $file->getClientOriginalName();
-            $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
-
             if ($request->hasFile('file'))
             {
+                $file = $request->file('file');
+                $fileName = $file->getClientOriginalName();
+                $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
+
                 if (!File::exists($pathFile)) {
                     File::makeDirectory($pathFile, 0777, true);
                 }
