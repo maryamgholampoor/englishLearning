@@ -277,16 +277,19 @@ class PadcastController extends Controller
                 $video_file = $getID3->analyze($path_file);
                 $duration_seconds = $video_file['playtime_seconds'];
                 $duration = date('H:i:s', $duration_seconds);
+
+                if (!File::exists($pathFile)) {
+                    File::makeDirectory($pathFile, 0777, true);
+                }
             }
 
             $padcast = Padcast::find($id);
 
-            if (!File::exists($pathFile)) {
-                File::makeDirectory($pathFile, 0777, true);
-            }
-
+            $duration=null;
+            $sizeFile=null;
 
             if ($request->has('name')) {
+
                 $padcast->name = $request->input('name');
             }
             if ($request->has('text')) {
@@ -299,13 +302,14 @@ class PadcastController extends Controller
                 $padcast->file_path = $path_file;
             }
             if($duration != null){
+
                 $padcast->time = $duration;
             }
             if($sizeFile != null){
+
                 $padcast->bulk = $this->formatBytes($sizeFile);
             }
             $padcast->save();
-
 
             DB::commit();
 
@@ -313,7 +317,7 @@ class PadcastController extends Controller
 
         } catch (\Exception $exception) {
             DB::rollBack();
-            return $this->sendJsonResponse([], $exception, $this->getStatusCodeByCodeName('Internal Server Error'));
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
     }
 

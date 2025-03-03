@@ -8,6 +8,7 @@ use App\Http\Utilities\Response;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use App\Http\Utilities\StatusCode;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -30,7 +31,7 @@ class TicketController extends Controller
         $this->validate($request, [
             'subject' => 'required|string|min:3|max:255',
             'ticket_text' => 'required|string|min:5|max:5000',
-            'date' => 'required|date',
+            'date' => 'date',
             'user_id' => 'required|integer|exists:users,id',
             'category_id' => 'required|integer|exists:ticket_category,id',
         ]);
@@ -38,10 +39,19 @@ class TicketController extends Controller
         try {
             // Start a transaction
             DB::beginTransaction();
+            $date=$request->date;
+
             $ticket = new Ticket();
             $ticket->subject = $request->subject;
             $ticket->ticket_text = $request->ticket_text;
-            $ticket->date = $request->date;
+            if(isset($request->date))
+            {
+                $ticket->date = $date;
+            }
+            else
+            {
+                $ticket->date = Date::now();
+            }
             $ticket->user_id = $request->user_id;
             $ticket->category_id = $request->category_id;
             $ticket->save();
