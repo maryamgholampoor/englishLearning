@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Utilities\Request as UtilityRequest;
 use App\Http\Utilities\Response;
 use App\Models\Ticket;
+use App\Models\TicketCategory;
 use Illuminate\Http\Request;
 use App\Http\Utilities\StatusCode;
 use Illuminate\Support\Facades\Date;
@@ -95,6 +96,18 @@ class TicketController extends Controller
         }
     }
 
+    public function showTicketCategory()
+    {
+        try {
+            $ticketCategory = TicketCategory::get();
+            DB::commit();
+            return $this->sendJsonResponse($ticketCategory, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+    }
+
     public function showUserTicket(Request $request)
     {
         $this->validate($request, [
@@ -119,7 +132,7 @@ class TicketController extends Controller
             $tickets = Ticket::with('user', 'ticketCategory')->get();
             DB::commit();
 
-            return $this->sendJsonResponse($tickets, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+            return $this->sendJsonResponse($tickets, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
         } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));

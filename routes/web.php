@@ -81,6 +81,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('showUserTicket', ['as' => 'ticket.showUser', 'uses' => 'TicketController@showUserTicket']);
             $router->post('changeTicketStatus/{id}', ['as' => 'ticket.showUser', 'uses' => 'TicketController@editTicketStatus']);
             $router->post('downloadFile/{id}', ['as' => 'ticket.showUser', 'uses' => 'TicketController@downloadFile']);
+            $router->get('showTicketCategory', ['as' => 'ticket.showUser', 'uses' => 'TicketController@showTicketCategory']);
         });
 
         $router->group(['prefix' => 'admin'], function () use ($router) {
