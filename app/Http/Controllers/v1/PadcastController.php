@@ -283,7 +283,7 @@ class PadcastController extends Controller
                 }
             }
 
-            $padcast = Padcast::find($id);
+            $padcast = Padcast::where('id',$id)->with('padcastCategory')->first();
 
             $duration=null;
             $sizeFile=null;
@@ -309,8 +309,8 @@ class PadcastController extends Controller
 
                 $padcast->bulk = $this->formatBytes($sizeFile);
             }
-            $padcast->save();
 
+            $padcast->save();
             DB::commit();
 
             return $this->sendJsonResponse($padcast, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
