@@ -150,6 +150,8 @@ class RoleController extends Controller
         try {
             DB::beginTransaction();
 
+            $PermRolePermission=PermRolePermission::where('perm_role_id',$request->role_id)->delete();
+
             foreach ($request->actions as $action)
             {
                 PermRolePermission::create(['perm_role_id' => $request->role_id , 'perm_action_id' => $action]);
