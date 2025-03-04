@@ -139,7 +139,7 @@ class RoleController extends Controller
 
         // Check validation
         $this->rules = [
-            'role_id' => 'required|string|max:100|unique:perm_roles,id',
+            'role_id' => 'required|string|max:100|exists:perm_roles,id',
             'actions.*' => 'required|exists:perm_actions,id'
         ];
 

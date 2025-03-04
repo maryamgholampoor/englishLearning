@@ -309,7 +309,6 @@ class PadcastController extends Controller
 
                 $padcast->bulk = $this->formatBytes($sizeFile);
             }
-
             $padcast->save();
             DB::commit();
 
