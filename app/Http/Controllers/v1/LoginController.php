@@ -147,7 +147,7 @@ class LoginController extends Controller
 
         $admin = Admin::where('email', $request->email)->first();
 //
-//      return Hash::make($request->password);
+//      return Hash::make("Kh6040@h");
 
         if (!$admin || !Hash::check($request->password, $admin->password)) {
             return response()->json(['error' => 'Invalid credentials'], 401);

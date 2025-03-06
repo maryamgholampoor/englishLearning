@@ -165,6 +165,7 @@ class RoleController extends Controller
         }
 
     }
+
     /**
      * @param Request $request
      * @param $id
@@ -207,7 +208,6 @@ class RoleController extends Controller
      * @param $id
      * @return JsonResponse
      */
-
     public function getOneRole(Request $request, $id)
     {
         $role = PermRole::find($id);

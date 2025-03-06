@@ -132,6 +132,23 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->get('/', ['as' => 'permAction.getAll', 'uses' => 'RoleController@getPermAction']);
         });
 
+        $router->group(['prefix' => 'form'], function () use ($router)
+        {
+            $router->post('/add', ['as' => 'form.add', 'uses' => 'FormController@addForm']);
+            $router->post('/edit', ['as' => 'form.edit', 'uses' => 'FormController@editForm']);
+            $router->get('/show', ['as' => 'form.show', 'uses' => 'FormController@showForm']);
+            $router->delete('/delete/{id}', ['as' => 'form.delete', 'uses' => 'FormController@deleteForm']);
+
+            $router->group(['prefix' => 'question'], function () use ($router)
+            {
+                $router->post('/add', ['as' => 'question.add', 'uses' => 'FormController@addQuestion']);
+                $router->post('/edit/{id}', ['as' => 'question.edit', 'uses' => 'FormController@editQuestion']);
+                $router->get('/show/{id}', ['as' => 'question.show', 'uses' => 'FormController@showQuestion']);
+                $router->delete('/delete/{id}', ['as' => 'question.delete', 'uses' => 'FormController@deleteQuestion']);
+                $router->get('/showQuestionForm/{id}', ['as' => 'question.show', 'uses' => 'FormController@showQuestionForm']);
+                $router->get('/showQuestionBookSeason/{id}', ['as' => 'question.show', 'uses' => 'FormController@showQuestionBookSeason']);
+            });
+        });
 
     });
 });
