@@ -68,11 +68,12 @@ class FormController extends Controller
             'season_id' => 'required|integer|exists:book_season,id',
             'book_id' => 'required|integer|exists:book,id',
         ]);
+
         try {
             // Start a transaction
             DB::beginTransaction();
 
-            $form = Form::where('id', $id)->first();
+            $form = Form::find($id);
             $form->category_id = $request->category_id;
             $form->season_id = $request->season_id;
             $form->book_id = $request->book_id;
@@ -232,7 +233,7 @@ class FormController extends Controller
             $question = Question::where('id', $id)->delete();
             DB::commit();
 
-            return $this->sendJsonResponse($question, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+            return $this->sendJsonResponse($question, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -273,8 +274,6 @@ class FormController extends Controller
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
     }
-
-
 
 }
 

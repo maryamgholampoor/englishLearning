@@ -53,12 +53,12 @@ class UsersController extends Controller
         try {
             $user_id = $request->user_id;
 
-            $this->rules = ['user_id'=>'required|integer|exists:Users,id',
-                             'name'=>'string|max:255',
-                             'last_name'=>'string|max:255',
-                             'email'=>'email|unique:users,email',
-                             'birth_date'=>'date',
-                             'sex'=>'integer'];
+            $this->rules = ['user_id' => 'required|integer|exists:Users,id',
+                'name' => 'string|max:255',
+                'last_name' => 'string|max:255',
+                'email' => 'email|unique:users,email',
+                'birth_date' => 'date',
+                'sex' => 'integer'];
 
             if (!$this->validateRequest($request->all())) {
                 return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
@@ -90,32 +90,60 @@ class UsersController extends Controller
         DB::beginTransaction();
         try {
 
-        $validator = Validator::make($request->all(), [
-            'name'          => 'nullable|string|max:255',
-            'last_name'     => 'nullable|string|max:255',
-            'email'         => 'nullable|email|unique:users,email,' . $id,
-            'birth_date'    => 'nullable|date',
-            'sex'           => 'nullable|in:male,female,other',
-        ]);
+            $validator = Validator::make($request->all(), [
+                'name' => 'string|max:255',
+                'last_name' => 'string|max:255',
+                'email' => 'email|unique:users,email,' . $id,
+                'birth_date' => 'date',
+                'sex' => 'in:male,female,other',
+            ]);
 
             if (!$this->validateRequest($request->all())) {
                 return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Acceptable'));
             }
 
-        $user = User::where('id', $id)->first();
-        if (!$user) {
-            if (!$this->validateRequest($request->all())) {
-                return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Found'));
+            $user = User::where('id', $id)->first();
+            if (!$user) {
+                if (!$this->validateRequest($request->all())) {
+                    return $this->sendJsonResponse([], $this->validation_messages, $this->getStatusCodeByCodeName('Not Found'));
+                }
+                return response()->json(['error' => 'User not found'], 404);
             }
 
-            return response()->json(['error' => 'User not found'], 404);
-        }
+            if ($request->name != null) {
+                $user->name = $request->name;
+            }else{
+                $user->name = null;
 
-        $user->update($request->except(['profile_pic']));
-        $user->save();
+            }
+            if ($request->last_name != null) {
+                $user->last_name = $request->last_name;
+            }
+            else{
+                $user->last_name=null;
+            }
+            if ($request->email != null) {
+                $user->email = $request->email;
+            }
+            else{
+                $user->email=null;
+            }
+            if ($request->birth_date != null) {
+                $user->birth_date = $request->birth_date;
+            }
+            else{
+                $user->birth_date=null;
+            }
+            if ($request->sex != null) {
+                $user->sex = $request->sex;
+            }else{
+                $user->sex =null;
+            }
 
-        DB::commit();
-        return $this->sendJsonResponse($user, trans('message.user_updated_successfully'), $this->getStatusCodeByCodeName('OK'));
+            $user->save();
+
+            DB::commit();
+            return $this->sendJsonResponse($user, trans('message.user_updated_successfully'), $this->getStatusCodeByCodeName('OK'));
 
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -154,8 +182,7 @@ class UsersController extends Controller
             $user_info = User::where('id', $user_id)->get();
 
             return $this->sendJsonResponse($user_info, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
