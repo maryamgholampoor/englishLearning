@@ -124,7 +124,6 @@ class FormController extends Controller
     {
         $this->validate($request, [
             'form_id' => 'required|integer|exists:form,id',
-            'category_id' => 'required|integer|exists:book_category,id',
             'question' => 'required|string',
             'question_type' => 'required|integer',
             'option_one' => 'string',
