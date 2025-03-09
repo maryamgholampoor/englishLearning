@@ -92,7 +92,7 @@ class LoginController extends Controller
         try {
             $users = User::where('id',$request->user_id)->first();
 
-            $result = LoginCode::where('user_id',$request->user_id)->where('code',$request->code)->first();
+            $result = LoginCode::where('user_id',$request->user_id)->where('code',$request->code)->where('used_time',null)->first();
             if (!$result) {
                 return $this->sendJsonResponse([], trans('message.there_is_no_login_code_with_specific'), $this->getStatusCodeByCodeName('Bad Request'));
             }

@@ -12,6 +12,8 @@ use App\Http\Utilities\StatusCode;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Morilog\Jalali\Jalalian;
+use Carbon\Carbon;
 
 class TicketController extends Controller
 {
@@ -29,6 +31,12 @@ class TicketController extends Controller
 
     public function addTicket(Request $request)
     {
+        $gregorianDate = '2025-03-09'; // تاریخ میلادی
+//      $tehranTime = Carbon::now('Asia/Tehran');
+//      return $tehranTime;
+
+        $jalaliDateNow = Jalalian::fromDateTime(Date::now())->format('Y-m-d');
+
         $this->validate($request, [
             'subject' => 'required|string|min:3|max:255',
             'ticket_text' => 'required|string|min:5|max:5000',
@@ -51,7 +59,7 @@ class TicketController extends Controller
             }
             else
             {
-                $ticket->date = Date::now();
+                $ticket->date = $jalaliDateNow;
             }
             $ticket->user_id = $request->user_id;
             $ticket->category_id = $request->category_id;
@@ -71,7 +79,7 @@ class TicketController extends Controller
         $this->validate($request, [
             'subject' => 'required|string|min:3|max:255',
             'ticket_text' => 'required|string|min:5|max:5000',
-            'date' => 'required|date',
+            'date' => 'date',
             'user_id' => 'required|integer|exists:users,id',
             'category_id' => 'required|integer|exists:ticket_category,id',
         ]);

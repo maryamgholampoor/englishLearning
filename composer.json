@@ -10,6 +10,7 @@
         "james-heinrich/getid3": "^1.9",
         "laravel/lumen-framework": "^10.0",
         "laravel/passport": "^11.8",
+        "morilog/jalali": "^3.4",
         "php-open-source-saver/jwt-auth": "^2.3",
         "tymon/jwt-auth": "^2.1"
     },

@@ -105,7 +105,6 @@ class BookController extends Controller
 
     public function addBook(Request $request)
     {
-
         $book_category_id = $request->book_category_id;
         $name = $request->name;
         $accent = $request->accent;
@@ -231,7 +230,6 @@ class BookController extends Controller
         }
 
     }
-
 
     public function addBookSeason(Request $request)
     {
