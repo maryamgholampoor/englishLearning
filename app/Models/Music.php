@@ -11,4 +11,9 @@ class Music extends Model
 
     protected $table = 'music';
 
+    public function musicCategory()
+    {
+        return $this->belongsTo(MusicCategory::class, 'music_category_id');
+    }
+
 }

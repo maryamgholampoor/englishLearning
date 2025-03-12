@@ -150,5 +150,23 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             });
         });
 
+        $router->group(['prefix' => 'music'], function () use ($router)
+        {
+            $router->post('/add', ['as' => 'music.add', 'uses' => 'MusicController@addMusic']);
+            $router->post('/edit/{id}', ['as' => 'music.edit', 'uses' => 'MusicController@updateMusic']);
+            $router->delete('/delete/{id}', ['as' => 'music.delete', 'uses' => 'MusicController@deleteMusic']);
+            $router->get('/show', ['as' => 'music.get', 'uses' => 'MusicController@showMusic']);
+
+            $router->group(['prefix' => 'category'], function () use ($router)
+            {
+                $router->post('/add', ['as' => 'category.add', 'uses' => 'MusicController@addMusicCategory']);
+                $router->post('/edit/{id}', ['as' => 'category.edit', 'uses' => 'MusicController@updateMusicCategory']);
+                $router->delete('/delete/{id}', ['as' => 'category.delete', 'uses' => 'MusicController@deleteMusicCategory']);
+                $router->get('/show', ['as' => 'category.show', 'uses' => 'MusicController@showMusicCategory']);
+                $router->get('/showMusic/{id}', ['as' => 'category.showMusic', 'uses' => 'MusicController@showMusicWithCategory']);
+            });
+        });
+
+
     });
 });
