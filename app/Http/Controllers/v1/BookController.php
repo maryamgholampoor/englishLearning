@@ -322,7 +322,7 @@ class BookController extends Controller
     {
         try {
             DB::beginTransaction();
-            $BookSeason = BookSeason::get();
+            $BookSeason = BookSeason::with('book')->get();
             DB::commit();
 
             return $this->sendJsonResponse($BookSeason, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
