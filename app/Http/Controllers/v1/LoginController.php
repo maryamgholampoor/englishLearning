@@ -57,7 +57,7 @@ class LoginController extends Controller
             $code = $this->randomDigits(5);
             $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
 
-            $result = LoginCode::where('user_id', $request->user_id)->update(['used_time' => date('Y-m-d H:i:s')]);
+            $result = LoginCode::where('user_id', $user->id)->update(['used_time' => date('Y-m-d H:i:s')]);
 
             LoginCode::create(['code' => $code, 'user_id' => $user->id, 'expiration_time' => $expiration]);
             $this->sendMessageRegisterCompleted($user, $code, "3233");
