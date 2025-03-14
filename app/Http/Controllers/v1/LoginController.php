@@ -35,7 +35,7 @@ class LoginController extends Controller
 
     }
 
-    protected $jwt_secret="ojoijoiiiji";
+    protected $jwt_secret = "ojoijoiiiji";
 
     public function doLogin(Request $request)
     {
@@ -49,15 +49,20 @@ class LoginController extends Controller
 
         DB::beginTransaction();
         try {
-            $user = User::where('mobile_number',$request->mobile_number)->first();
+            $user = User::where('mobile_number', $request->mobile_number)->first();
             if (!$user) {
                 $user = User::create(['mobile_number' => $request->mobile_number, 'user_status' => User::USER_ACTIVE]);
             }
             // Create login code and send it
             $code = $this->randomDigits(5);
             $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
+
+            $result = LoginCode::where('user_id', $request->user_id)->update(['used_time' => date('Y-m-d H:i:s')]);
+
             LoginCode::create(['code' => $code, 'user_id' => $user->id, 'expiration_time' => $expiration]);
-            $this->sendMessageRegisterCompleted($user , $code ,"3233");
+            $this->sendMessageRegisterCompleted($user, $code, "3233");
+
+
             // Commit transaction
             DB::commit();
             // Return response
@@ -90,9 +95,17 @@ class LoginController extends Controller
         }
         // Check code
         try {
-            $users = User::where('id',$request->user_id)->first();
+            $users = User::where('id', $request->user_id)->first();
 
-            $result = LoginCode::where('user_id',$request->user_id)->where('code',$request->code)->where('used_time',null)->first();
+            $result = LoginCode::where('user_id', $request->user_id)->where('code', $request->code)->where('used_time', null)->first();
+
+            if (!$result) {
+                return $this->sendJsonResponse([], trans('message.there_is_no_login_code_with_specific'), $this->getStatusCodeByCodeName('Bad Request'));
+            }
+            // Save result
+            $result->used_time = date('Y-m-d H:i:s');
+            $result->save();
+
             if (!$result) {
                 return $this->sendJsonResponse([], trans('message.there_is_no_login_code_with_specific'), $this->getStatusCodeByCodeName('Bad Request'));
             }
@@ -111,7 +124,7 @@ class LoginController extends Controller
 
             $token = JWT::encode($payload, $this->jwt_secret, 'HS256');
             // Return response
-            return $this->sendJsonResponse(['users'=> $users ,'token' => $token, 'token_type' => 'bearer'], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+            return $this->sendJsonResponse(['users' => $users, 'token' => $token, 'token_type' => 'bearer'], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
         } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
@@ -163,7 +176,7 @@ class LoginController extends Controller
 
         $token = JWT::encode($payload, $this->jwt_secret, 'HS256');
 
-        return $this->sendJsonResponse(['token' => $token,'admin'=>$admin], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+        return $this->sendJsonResponse(['token' => $token, 'admin' => $admin], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
 
     }
 
