@@ -33,21 +33,21 @@ class MusicController extends Controller
     {
         // Validate the request input
         $this->validate($request, [
-            'name' => 'required|string|max:255|unique:padcast_category,name',
+            'name' => 'required|string|max:255|unique:music_category,name',
             'image' => 'file',
         ]);
 
         try {
             $image = $request->file('image');
             $fileName = $image->getClientOriginalName();
-            $path = app()->basePath('public/uploads/padcastCat' . DIRECTORY_SEPARATOR);
+            $path = app()->basePath('public/uploads/musicCat' . DIRECTORY_SEPARATOR);
 
             if ($request->hasFile('image')) {
                 if (!File::exists($path)) {
                     File::makeDirectory($path, 0777, true);
                 }
                 $image->move($path, $fileName);
-                $path_file = "uploads/padcastCat/$fileName";
+                $path_file = "uploads/musicCat/$fileName";
             }
             // Start a transaction
             DB::beginTransaction();
@@ -87,22 +87,22 @@ class MusicController extends Controller
     {
         // Validate the incoming request data
         $this->validate($request, [
-            'name' => 'required|string|max:255|unique:padcast_category,name',
-        ]);
+            'name' => 'required|string|max:255|unique:music_category,name',
+            ]);
 
         try {
             $image = $request->file('image');
             if (isset($image)) {
                 $image = $request->file('image');
                 $fileName = $image->getClientOriginalName();
-                $path = app()->basePath('public/uploads/padcastCat' . DIRECTORY_SEPARATOR);
+                $path = app()->basePath('public/uploads/musicCat' . DIRECTORY_SEPARATOR);
 
                 if ($request->hasFile('image')) {
                     if (!File::exists($path)) {
                         File::makeDirectory($path, 0777, true);
                     }
                     $image->move($path, $fileName);
-                    $path_file = "uploads/padcast/$fileName";
+                    $path_file = "uploads/musicCat/$fileName";
                 }
             }
 
@@ -166,7 +166,7 @@ class MusicController extends Controller
             $musicCategory_id = $request->input('musicCategory_id');
             $file = $request->file('file');
             $fileName = $file->getClientOriginalName();
-            $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
+            $pathFile = app()->basePath('public/uploads/music' . DIRECTORY_SEPARATOR);
 
             if ($request->hasFile('file')) {
                 if (!File::exists($pathFile)) {
@@ -178,14 +178,14 @@ class MusicController extends Controller
 
             $image = $request->file('image');
             $imageName = $image->getClientOriginalName();
-            $pathImage = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
+            $pathImage = app()->basePath('public/uploads/music' . DIRECTORY_SEPARATOR);
 
             if ($request->hasFile('file')) {
                 if (!File::exists($pathFile)) {
                     File::makeDirectory($pathFile, 0777, true);
                 }
                 $file->move($pathImage, $imageName);
-                $path_image = "uploads/music/$fileName";
+                $path_image = "uploads/music/$imageName";
             }
 
             // Create a new Padcast
@@ -212,9 +212,6 @@ class MusicController extends Controller
 
     public function showMusic(Request $request)
     {
-        $this->validate($request, [
-            'integer, exists:padcast_category,id',
-        ]);
 
         $category_id = $request->input('category_id');
 
@@ -252,7 +249,7 @@ class MusicController extends Controller
             $musicCategory_id = $request->input('musicCategory_id');
             $file = $request->file('file');
             $fileName = $file->getClientOriginalName();
-            $pathFile = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
+            $pathFile = app()->basePath('public/uploads/music' . DIRECTORY_SEPARATOR);
 
             if ($request->hasFile('file')) {
                 if (!File::exists($pathFile)) {
@@ -264,14 +261,14 @@ class MusicController extends Controller
 
             $image = $request->file('image');
             $imageName = $image->getClientOriginalName();
-            $pathImage = app()->basePath('public/uploads/padcast' . DIRECTORY_SEPARATOR);
+            $pathImage = app()->basePath('public/uploads/music' . DIRECTORY_SEPARATOR);
 
             if ($request->hasFile('file')) {
                 if (!File::exists($pathFile)) {
                     File::makeDirectory($pathFile, 0777, true);
                 }
                 $file->move($pathImage, $imageName);
-                $path_image = "uploads/music/$fileName";
+                $path_image = "uploads/music/$imageName";
             }
 
             // Create a new Padcast
