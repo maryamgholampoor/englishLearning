@@ -39,39 +39,56 @@ class LoginController extends Controller
 
     public function doLogin(Request $request)
     {
-        $this->validate($request, [
-            'mobile_number' => [
-                'required',
-                'string',
-                'regex:/^(\+98|0)?9\d{9}$/',
-            ],
-        ]);
+        $mobileNumber = $request->mobile_number;
+        $mobileNumber = preg_replace('/^(\+98|0)/', '', $mobileNumber); // حذف +98 یا 0 از ابتدا
+        $mobileNumber = '9' . substr($mobileNumber, -9); // اطمینان از فرمت صحیح
 
         DB::beginTransaction();
         try {
-            $user = User::where('mobile_number', $request->mobile_number)->first();
+            // جستجو با شماره نرمال‌شده
+            $user = User::where('mobile_number', $mobileNumber)->first();
+
+            // اگر کاربر وجود نداشت، فقط یکبار ایجاد شود
             if (!$user) {
-                $user = User::create(['mobile_number' => $request->mobile_number, 'user_status' => User::USER_ACTIVE]);
+                $user = User::create([
+                    'mobile_number' => $mobileNumber,
+                    'user_status' => User::USER_ACTIVE
+                ]);
             }
-            // Create login code and send it
+
+// تولید کد ورود و ارسال آن
             $code = $this->randomDigits(5);
-            $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
+            $expiration = now()->addMinutes(3);
 
-            $result = LoginCode::where('user_id', $user->id)->update(['used_time' => date('Y-m-d H:i:s')]);
+// به‌روزرسانی زمان استفاده از کد قبلی
+            LoginCode::where('user_id', $user->id)->update(['used_time' => date('Y-m-d H:i:s')]);
 
-            LoginCode::create(['code' => $code, 'user_id' => $user->id, 'expiration_time' => $expiration]);
+// ثبت کد جدید
+            LoginCode::create([
+                'code' => $code,
+                'user_id' => $user->id,
+                'expiration_time' => $expiration
+            ]);
+
             $this->sendMessageRegisterCompleted($user, $code, "3233");
 
-
-            // Commit transaction
+// تأیید تراکنش
             DB::commit();
-            // Return response
-            return $this->sendJsonResponse(['user' => $user], trans('message.result_is_ok'), $this->getStatusCodeByCodeName('Created'));
+
+            return $this->sendJsonResponse(
+                ['user' => $user],
+                trans('message.result_is_ok'),
+                $this->getStatusCodeByCodeName('Created')
+            );
+
         } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
+
     }
+
+
 
     public function checkLoginCode(Request $request)
     {
