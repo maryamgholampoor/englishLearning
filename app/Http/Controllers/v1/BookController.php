@@ -428,7 +428,7 @@ class BookController extends Controller
         try {
             DB::beginTransaction();
 
-            $bookmark = Bookmark::with('user','book')->where('user_id', $user_id)->get();
+            $bookmark = Bookmark::with('user', 'book')->where('user_id', $user_id)->get();
 
             DB::commit();
             return $this->sendJsonResponse($bookmark, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
@@ -451,29 +451,45 @@ class BookController extends Controller
 
             if ($type == "pudcast") {
 
-                foreach ($pudcast_id as $key=>$id)
-                {
-                    $pudcast=Padcast::where('id',$id)->delete();
+                foreach ($pudcast_id as $key => $id) {
+                    $pudcast = Padcast::where('id', $id)->delete();
                 }
 
                 DB::commit();
                 return $this->sendJsonResponse($pudcast, trans('message.delete_successfully'), $this->getStatusCodeByCodeName('OK'));
-            }
+            } else if ($type == "book") {
 
-            else if ($type == "book") {
-
-                foreach ($book_id as $key=>$id)
-                {
-                    $book=Book::where('id',$id)->delete();
+                foreach ($book_id as $key => $id) {
+                    $book = Book::where('id', $id)->delete();
                 }
 
                 DB::commit();
                 return $this->sendJsonResponse($book, trans('message.delete_successfully'), $this->getStatusCodeByCodeName('OK'));
             }
 
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
-        catch (\Exception $exception)
+    }
+
+    public function showAllBooks()
+    {
+        try
         {
+        DB::beginTransaction();
+        $allCategory = BookCategory::all();
+
+        foreach ($allCategory as $cat)
+        {
+            $cat_id=$cat->id;
+            $books=Book::where('book_category_id',$cat_id)->get();
+            $cat['books']=$books;
+        }
+            DB::commit();
+            return $this->sendJsonResponse($allCategory, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+
+        } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
