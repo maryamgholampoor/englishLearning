@@ -121,11 +121,9 @@ class WordController extends Controller
 
     public function showWordCategory(Request $request)
     {
-        $word_category_id = $request->word_category_id;
         $user_id = $request->user_id;
 
         $this->validate($request, [
-            'word_category_id' => ['required', 'integer', 'exists:word_category,id'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);
 
@@ -136,7 +134,7 @@ class WordController extends Controller
             {
                 $category_id=$category->id;
                 $wordUser=WordUser::where('user_id',$user_id)->where('category_id',$category_id)->count();
-                $word=Word::where('word_category_id',$word_category_id)->count();
+                $word=Word::where('word_category_id',$category_id)->count();
 
                 $category->setAttribute('saving_count',$wordUser);
                 $category->setAttribute('word_counts',$word);
@@ -220,6 +218,7 @@ class WordController extends Controller
     {
         try {
             $wordCategory = WordCategory::get();
+
 
             return $this->sendJsonResponse($wordCategory, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
