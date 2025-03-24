@@ -216,6 +216,19 @@ class WordController extends Controller
         }
     }
 
+    public function showAllWordCategory(Request $request)
+    {
+        try {
+            $wordCategory = WordCategory::get();
+
+            return $this->sendJsonResponse($wordCategory, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
+        }
+    }
+
     public function showVoice(Request $request)
     {
         $word_id = $request->word_id;

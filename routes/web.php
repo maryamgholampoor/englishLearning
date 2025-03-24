@@ -104,6 +104,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->post('update/{id}', ['as' => 'wordCategory.update', 'uses' => 'WordController@updateWordCategory']);
             $router->delete('delete/{id}', ['as' => 'wordCategory.delete', 'uses' => 'WordController@deleteWordCategory']);
             $router->post('show', ['as' => 'wordCategory.show', 'uses' => 'WordController@showWordCategory']);
+            $router->get('show', ['as' => 'wordCategory.showAll', 'uses' => 'WordController@showAllWordCategory']);
         });
 
         $router->group(['prefix' => 'wordUser'], function () use ($router) {
