@@ -65,7 +65,7 @@ $router->group(['prefix' => 'v1'], function () use ($router) {
             $router->get('book', ['as' => 'book.show', 'uses' => 'BookController@showBook']);
             $router->delete('book/{id}', ['as' => 'book.delete', 'uses' => 'BookController@deleteBook']);
             $router->post('showBookWithCategory', ['as' => 'book.delete', 'uses' => 'BookController@showBookWithCategory']);
-            $router->post('showAllBooks', ['as' => 'book.delete', 'uses' => 'BookController@showAllBooks']);
+            $router->get('showAllBooks', ['as' => 'book.delete', 'uses' => 'BookController@showAllBooks']);
 
             $router->post('bookSeason', ['as' => 'bookSeason.add', 'uses' => 'BookController@addBookSeason']);
             $router->post('bookSeason/{id}', ['as' => 'bookSeason.edit', 'uses' => 'BookController@editBookSeason']);
