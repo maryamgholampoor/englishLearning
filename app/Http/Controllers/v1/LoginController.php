@@ -58,7 +58,7 @@ class LoginController extends Controller
 
 // تولید کد ورود و ارسال آن
             $code = $this->randomDigits(5);
-            $expiration = now()->addMinutes(3);
+            $expiration = date('Y-m-d H:i:s', strtotime('+3 minutes'));
 
 // به‌روزرسانی زمان استفاده از کد قبلی
             LoginCode::where('user_id', $user->id)->update(['used_time' => date('Y-m-d H:i:s')]);
