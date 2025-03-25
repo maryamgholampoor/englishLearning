@@ -134,15 +134,15 @@ class BookController extends Controller
             $book->name = $name;
             $book->image_path = $path_file;
             $book->save();
+            $bookCat=Book::where('id',$book->id)->with('bookCategory')->get();
             DB::commit();
 
-            return $this->sendJsonResponse($book, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+            return $this->sendJsonResponse($bookCat, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
         } catch (\Exception $exception) {
             DB::rollBack();
             return $this->sendJsonResponse([], $exception->getMessage(), $this->getStatusCodeByCodeName('Internal Server Error'));
         }
-
 
     }
 
@@ -264,9 +264,10 @@ class BookController extends Controller
             $bookSeason->book_id = $book_id;
             $bookSeason->season_name = $season_name;
             $bookSeason->save();
+            $bookSeasons=BookSeason::where('id',$bookSeason->id)->with('book')->first();
             DB::commit();
 
-            return $this->sendJsonResponse($bookSeason, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
+            return $this->sendJsonResponse($bookSeasons, trans('message.result_is_ok'), $this->getStatusCodeByCodeName('OK'));
 
         } catch (\Exception $exception) {
             DB::rollBack();
